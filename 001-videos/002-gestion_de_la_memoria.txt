@@ -1,0 +1,79 @@
+--- MEMORIA CACHE ---
+* Estructura y funcionamiento
+    - La unidad de tranferencia entre memoria principal (MP) y memoria cache (MC) es el bloque o linea.
+    - Cada bloque esta constituido por un conjunto de 2^r palabras.
+    - La memoria cache y la memoria central estan divididas en lineas o bloques de igual tamaño.
+
+|CPU|-------------->|MC|-------------->|MP|
+        palabras            bloques
+
+--- MEMORIA CACHE ---
+* Estructura y funcionamiento
+    - Organizacion:
+        * ¿Como se sabe si una posicion de MP se encuentra copiada en una posicion de MC?
+        * ¿Donde se copian las posiciones de MP en MC?
+    - Adquisicion:
+        * ¿Cuando se lleva una linea de MP a MC?
+    - Actualizacion:
+        * ¿Cuando se actualiza el contenido de MC en MP?
+    - Reemplazo:
+        * ¿Que linea de cache se desprecia cuando se necesita espacio en MC para otra diferente?
+
+--- MEMORIA CACHE ---
+* Organizacion:
+    - Cada linea de cache esta compuesta por tres campos:
+        * Bit de validez.
+        * Informacion de etiqueta. Para realizar la correspondencia entre la linea de cache y el bloque de MP que almacena.
+        * Datos.
+    - Localizacion de un bloque de memoria central en una linea de la memoria cache:
+        * Mapeado directo
+        * Completamente asociativa
+        * Asociativa por conjuntos
+
+--- CACHE DE MAPEO DIRECTO ---
+* Organizacion:
+    - Cada bloque de MP se puede almacenar solo en una determinada linea de MC.
+    - Si se tiene M lineas de cache.
+        SI SE ELIGE m COMO UNA POTENCIA DE 2
+    - Como se sabe, daba una direccion de MP en que linea de MC se cuncuentra
+
+|   18 b   |  10 b  |   2 b   | 2 B  |
+| Etiqueta | Indice | Palabra | Byte |
+
+                     |                BLOQUE                 |
+|   1 b   |   18 b   |   4 B   |   4 B   |   4 B   |   4 B   |
+| validez | etiqueta | Palabra | Palabra | Palabra | Palabra |
+
+Simple, facil de implementar
+Posicion concreta de cache para cada bloque dado
+
+Con la etiqueta comprueba si el bloque corresponde
+
+--- CACHE ASOCIATIVA ---
+* Organizacion:
+    - Los bloques de la MP se pueden almacenar en cualquie linea de la MC.
+
+|   28 b   |   2 b   |  2 b |
+| Etiqueta | Palabra | Byte |
+
+                     |                BLOQUE                 |
+|   1 b   |   18 b   |   4 B   |   4 B   |   4 B   |   4 B   |
+| validez | etiqueta | Palabra | Palabra | Palabra | Palabra |
+
+Como se sabe, dada una direccion de MP en que linea se MC se encuentra?
+Flexibilidad para que cualquier bloque se encuentre en cualquier linea de MC vs circuiteria muy compleja examinar en paralelo todas las etiquetas.
+
+NOTA: Las cache asociativas son en general pequeñas. Imposible de hacer en tamaños grandes.
+
+--- CACHE ASOCIATIVA POR CONJUNTOS ---
+* Hace una parte por mapeo directo y otra por asociativa.
+
+|   18 b   |  10 b  |   2 b   | 2 B  |
+| Etiqueta | Indice | Palabra | Byte |
+
+|   1 b   |   18 b   |   4 W   |         |   1 b   |   18 b   |   4 W   |
+| validez | etiqueta | Bloque  |         | validez | etiqueta | Bloque  |
+
+busca primero de manera directa, y luego de manera asociativa.
+
+NOTA: mejora la prestacion de la cache directa y la flexibilidad de la cache asociativa.
