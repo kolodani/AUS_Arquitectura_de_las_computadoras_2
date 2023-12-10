@@ -1,0 +1,78 @@
+--- INTRODUCCION ---
+
+* El sistema de memoria almacena los programas y datos que requiere la CPU
+* Sus prestaciones marcan las del ordenador completo: es un cuello de botella
+* Criterio en el diseño de las memorias:
+    - Coste por bit
+    - Velocidad
+    - Capacidad
+    - Consumo
+    - Fiabilidad
+* Estos criterios son incompatibles entre si, con lo que se llega a una solicuon de compromiso
+* La JERARQUIA DE MEMORIA
+
+--- JERARQUIA DE MEMORIA ---
+| NIVEL                | TIPO DE MEMORIA    | VELOCIDAD  | COSTE    | CAPACIDAD   | VOLATILIDAD |
+| PROGRAMA             | REGISTROS          | MUY RAPIDA | MUY CARA | MUY PEQUEÑA | VOLATIL     |
+| HARDWARE             | CACHE              | RAPIDA     | CARA     | PEQUEÑA     | VOLATIL     |
+| SISTEMAS OPERATIVOS  | MEMORIA PRINCIPAL  | MEDIA      | MEDIA    | MEDIA       | VOLATIL     |
+| SISTEMAS OPERATIVOS  | MEMORIA SECUNDARIA | LENTA      | BARATA   | GRANDE      | NO VOLATIL  |
+
+--- JERARQUIA DE MEMORIA ---
+La informacion fluye de un nivel inferior a uno superior segun va siendo necesaria
+
+guardo una copia en la cache de lo que tengo en la memoria principal
+guardo una copia en la memoria principal de lo que tengo en la memoria secundaria
+esto se hace para que la informacion este mas accesible, pero tengo que tener cuidado de que la informacion este actualizada
+
+--- JERARQUIA DE MEMORIA ---
+* Principio de localidad de las referencias
+    - Localidad temporal: Alta probabilidad de volver a hacer referencia a un mismo dato en un corto espacio de tiempo.
+    (significa que voy a volver a acceder a un dato que ya he accedido recientemente)
+    - Localidad espacial: Alta probabilidad de que la siguiente referencia sea a un ato almacenado en una posicion cercana a la anterior.
+    (significa que voy a acceder a un dato que esta cerca de otro que ya he accedido recientemente)
+    Ejemplo sencillo: ejecucion de una rutina
+
+* Propiedad de una jerarquia de memoria
+    - Todos los datos contenidos en un nivel se encuentran en un nivel superior.
+    - Las copias de un mismo dato en diferentes niveles deben ser coherentes.
+
+--- CARACTERISTICASD DE LA MEMORIA ---
+* Las memorias se caracterizan por su:
+    - Ubicacion:
+        * Interna: Conectada directamente a la CPU.
+           Ejemplo: memoria principal(MP)
+           (se acceden con las instruciones LW y SW)
+        * Externa: conectada a la CPU a travez de E/S.
+           Ejemplo: disco rigido
+           (se necesitan con muchas instruciones para acceder a ellas)
+    - Capacidad:
+        * En la memorias externas se expresa en bytes.
+        * En las internas se expresa en bytes o palabras.
+    - Unidad de transferencia:
+        * Palabras para la memoria interna.
+        * Bloques para la memoria externa.
+           Recuerde que: La memoria interna se organiza en palabras pero, la unidad direccionable suele ser el byte.
+
+--- CARACTERISTICASD DE LA MEMORIA ---
+* Las memorias se caracterizan por su:
+    - Metodo de acceso:
+        * Secuencial. Cintas.
+        * Directo. Discos.
+        * Aleatorio. Memoria principal y cache.
+        * Asociativo. Tablas de etiquetas para cache.
+    - Pretaciones:
+        * Tiempo de acceso (Ta).
+            - Vatiable en secuencial y directo.
+            - Fijo en las aleatorias.
+        * Tiempo de ciclo (Tc): se define para las memorias de acceso aleatorio como el tiempo minimo entre dos accesos consecutivos.
+        * Velocidad de transferencia: se define como 1/Tc para las aleatorias.
+
+--- MEMORIA DE ACCESO ALEATORIO ---
+* Tipos de memoria de acceso aleatorio:
+    - Registros internos.
+    - SRAM (cache). (se almacena informacion en flip-flops, mas hardware)
+    - DRAM (Memoria principal MP). (se almacena informacion en la capacidad parasita de los transistores, menos hardware, necesitan un refresco)
+    - ROM (Memoria no Volatil). BIOS, etc.
+
+Nota: mas grande la capacidad, es mas simple la memoria. pero mas lenta.
