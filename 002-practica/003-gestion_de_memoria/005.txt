@@ -1,0 +1,32 @@
+5 - Incrementar la asociatividad implica usar más comparadores y aumentar el tamaño
+    de la etiqueta para cada bloque. Suponiendo una caché de 4K bloques, bloques de
+    2 palabras y una dirección de 32 bits, calcular el número total de conjuntos y el
+    número total de bits de la etiqueta suponiendo que la caché es de correspondencia
+    directa, asociativa por conjuntos de 2 y 4 vías y completamente asociativa.
+
+a) cache de correspondencia directa:
+    direccion de 32 bits, esta compuesta:
+        2 bits de byte
+        1 bit de palabra
+        12 bits de indice
+        17 bits de etiqueta
+
+b) cache asociativa por conjuntos de 2:
+    direccion de 32 bits, esta compuesta:
+        2 bits de byte
+        1 bit de palabra
+        12 bits de indice
+        17 bits de etiqueta
+
+c) cache asociativa por conjuntos de 4:
+    direccion de 32 bits, esta compuesta:
+        2 bits de byte
+        1 bit de palabra
+        12 bits de indice
+        17 bits de etiqueta
+
+d) cache completamente asociativa:
+    direccion de 32 bits, esta compuesta:
+        2 bits de byte
+        1 bit de palabra
+        27 bits de etiqueta
