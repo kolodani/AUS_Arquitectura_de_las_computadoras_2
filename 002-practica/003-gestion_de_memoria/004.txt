@@ -1,0 +1,25 @@
+4 - Sea una memoria caché asociativa por conjunto de 2 vías de 64 KBytes de datos,
+    bloques de 4 palabras y direcciones de 32 bits, con las mismas consideraciones
+    que para el ejercicio anterior:
+    a) ¿Qué capacidad de almacentamiento total en bits es necesaria?
+    b) Si la caché fuera asociativa por conjuntos de 4 vías, ¿qué cantidad de
+    almacenamiento se necesita?
+    c) ¿Qué conclusión extrae de los resultados?
+
+direcciones de 32 bits, compuesta por:
+2 bits de byte
+2 bits de palabra
+16 bits de indice
+12 bits de etiqueta
+
+a) 2^16 bits de indice * 2^2 bits de byte * 2^2 bits de palabra * 32 bits de palabra = 2^22 bits = 4 Mbits
+b) si fuera de 4 vias en vez de 2
+direcciones de 32 bits, compuesta por:
+2 bits de byte
+2 bits de palabra
+14 bits de indice
+14 bits de etiqueta
+entonces 2^14 bits de indice * 2^2 bits de byte * 2^2 bits de palabra * 32 bits de palabra = 2^18 bits = 256 Kbits
+
+c) mas vias = menos capacidad de almacenamiento pero mas rapida
+la cantidad de almacenamiento necesario es inversamente proporcional a la cantidad de vias pero directamente proporcional a la cantidad de bloques por via. pero lo que pierde en capacidad lo gana en velocidad
