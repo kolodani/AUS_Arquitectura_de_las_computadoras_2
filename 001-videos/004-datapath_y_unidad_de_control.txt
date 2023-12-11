@@ -1,0 +1,115 @@
+* En este tema se estudia la unidad central de procesamiento (CPU)
+    - Camino de datos:
+        * Es la seccion del computador encargada de manipular y transformar los datos procedentes de la memoria o los registros internos, para obtener los resultados
+        * Su labor es soportar el conjunto de operaciones que precisan las instrucciones del repertorio que es capas de interpretar la unidad de control
+    - Unidad de control:
+        * Es la seccion del computador encargada de interpretar las instrucciones del programa y gobernar la ejecucion de las mismas
+* La organizacion de los procesadores ha evolucionado con el paso de los años, guiada por el desarrollo tecnologico y la necesidad de obteener altas prestaciones
+
+--- INTRODUCCION ---
+* El procesador es el que se encarga de ejecutar las instrucciones especificadas por el programa.
+* Funciones basicas:
+    - Captar instrucciones. El procesador debe leer instrucciones de la memoria
+    - interpretar instrucciones. La instruccion debe decodificarse para determinar que accion es necesaria
+    - Captar datos. La ejecucion puede exigir leer datos de la memoria o de un modulo de E/S
+    - Procesar datos. La ejecucion de una instruccion puede exigir llevar a cabo alguna operacion aritmetica o logica
+    - Escribir datos. Los resultados de una ejecucion puede tener que ser escritos en la memoria o en un modulo de E/S
+
+--- ESTRUCTURA BASICA DE UN PROCESADOR ---
+* El procesador se compone de varias partes:
+    1. La unidad de control
+    2. La unidad arimetico-logica
+    3. Un banco de registros
+    4. Otros registros internos, algunos de los mas importantes:
+        1. El contador de programa (PC)
+        2. El registro de instruccion (IR)
+
+--- DISEÑO DE UN CAMINO DE DATOS SENCILLO ---
+* Procesador monociclo:
+    - Comenzaremos por los elementos basicos y sus funciones asociadas
+    - Veremos los elementos necesarios para implementarlos
+    - Veremos un conjunto de instrucciones basicos
+    - Veremos como implementar estas instrucciones
+
+--- ESTRUCTURA BASICA DE UN PROCESADOR ---
+* Vamos a construir un camino de datos y su unidad de control para dos realizaciones diferentes de un subconjunto del repertorio de instrucciones del MIPS:
+    - instruccion de acceso a memoria: lw, sw
+    - instrucciones aritmetico-logicas: add, sub, or, slt
+    - instrucciones de salto condicional: beq
+    - instrucciones de salto incondicional: j
+
+--- ESTRUCTURA BASICA DE UN PROCESADOR ---
+* Metodologia de sincronizacion
+    - Las unidades funcionales se clasifican en dos tipos: combinacionales y secuenciales
+    - La Metodologia de sincronizacion define cuando pueden leerse y escribitse la diferentes señales
+    - Asumimos sincronizacion por flancos
+
+--- EL CICLO DE INTRODUCCION ---
+* El procesamiento que quiere una instrucicon se denomina ciclo de instruccion
+* Ciclo basico de instruccion:
+    - Inicio
+    - Captura de instruccion (Ciclo de captacion)
+    - Ejecucion de la instruccion (Ciclo de ejecucion)
+    - Fin
+
+--- EL CICLO DE INTRODUCCION ---
+* Para el subconjunto de instrucciones MIPS, los dos primeros pasos son identicos:
+    - Usar el contenido del PC para cargar, desde la memoria que contiene el codigo, la siguiente instruccion
+    - Leer uno o dos registros, utilizando para ellos los campos de la instruccion especificos para selsccionarlos
+
+--- DISEÑO DE UN CAMINO DE DATOS SENCILLO ---
+* Contador de programa:
+    - Cada instruccion esta en una direccion de memoria dada
+    - Almacena la direccion en el registro PC
+    - Tras procesar una instruccion avanzamos el contador hasta la siguiente instruccion
+
+--- DISEÑO DE UN CAMINO DE DATOS SENCILLO ---
+* Operaciones tipo R:
+    - Involucran tres registros: dos de lectura y uno de escritura
+    - Usan la ALU para Realizar las operaciones
+
+--- DISEÑO DE UN CAMINO DE DATOS SENCILLO ---
+* Acceso a memoria:
+    - instrucciones lw y sw
+    - La direccion se indica con un registro mas un desplazamiento de 16 bits con signo
+    - El desplazamiento se extiende a 32 bits
+
+--- DISEÑO DE UN CAMINO DE DATOS SENCILLO ---
+* Saltos condicionales:
+    - Evaluan si dos registros contienen o no el mismo valor
+    - Si la condicion se cumple aplican el salto
+    - El salto es relativo con signo
+    - Los 16 bits se extienden a 32 y se desplazan 2 posiciones a la izquierda para direccionar solo palabras completas
+    - El PC ya se ha actualizado a PC + 4
+
+--- DISEÑO DE UN CAMINO DE DATOS SENCILLO ---
+* Todo junto:
+    - Para construir el camino de datos hemos de combinar los elementos explicados anteriomente
+    - Intentaremos reutilizar parte del hardware
+    - El hardware compartido selecciona los datos mediante multiplexores
+    - Parte del hardware no se podra reutilizar y habra que replicarlo
+
+--- INCONVENIENTES DE LA IMPLEMENTACION MONOCICLO ---
+* El ciclo de reloj esta definido por la instruccion mas lenta
+* No es posible reutilizar ninguna unidad funcional
+* Estos inconvenientes se verian agravados en una arquitectura mas compleja que la arquitectura MIPS
+
+--- EVALUACION DEL RENDIMIENTO ---
+* Supongamos los tiempos de ejecucion de las unidades funcionales siguientes:
+    - Acceso a memoria: 2ns
+    - ALU y sumadores: 2ns
+    - Acceso a registros: 1ns
+* ¿Cual de las siguientes realizaciones sera mas rapida?
+    - Una realizacion en la que cada instruccion se ejecuta en un cliclo de tamaño fijo(cada instruccion tarda lo que tardaria la mas lenta).
+    - Una realizacion donde cada instruccion se ejecuta en un ciclo de longitud variable (cada instruccion tarda unicamente lo necesario)
+
+--- CALCULO DEL CICLO DE RELOJ ---
+|---------------------|-------------------------------------------------------------------------------------------|----|
+|Tipo de instruccion| Unidades funcionales utilizadas por cada tipo de instruccion                                | ns |
+|-------------------|---------------------------------------------------------------------------------------------|----|
+| aritmetica        | cargar instruccion | lectura de registros | ALU | escritura de registros                    | 6  |
+| lw                | cargar instruccion | lectura de registros | ALU | acceso a memoria | escritura de registros | 8  |
+| sw                | cargar instruccion | lectura de registros | ALU | escritura en memoria                      | 7  |
+| salto condicional | cargar instruccion | lectura de registros | ALU                                             | 5  |
+| jump              | cargar instruccion |                                                                        | 2  |
+|-------------------|---------------------------------------------------------------------------------------------|----|
