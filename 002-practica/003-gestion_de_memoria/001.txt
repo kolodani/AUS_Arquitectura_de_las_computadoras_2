@@ -1,0 +1,9 @@
+1 - Dada una caché de correspondencia directa de 64 bloques y un tamaño de bloque
+    de 16 bytes. ¿Qué número de bloque de la caché le corresponde a la dirección del
+    byte 1200 de la memoria principal?
+
+tamaño de la cache = 64 bloques * 16 bytes = 1024 bytes
+posicion = 1200 bytes - 1024 bytes = 176 bytes
+numero de bloque = 176 bytes / 16 bytes = 11
+
+RTA: el byte 1200 de la memoria principal le corresponde el bloque 11 de la cache
