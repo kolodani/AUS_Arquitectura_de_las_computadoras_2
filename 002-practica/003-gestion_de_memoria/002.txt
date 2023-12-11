@@ -1,0 +1,11 @@
+2 - Dada una caché de tamaño 256 bytes y bloques de 32 bytes, en la que los bloques
+    se ubican por corrrespondencia directa, ¿qué bloque de la caché le corresponde a
+    la dirección del byte 280 de memoria principal?
+
+tamaño de la caché: 256 bytes
+tamaño del bloque: 32 bytes
+bloques de la caché: 256/32 = 8
+posicion = 280 - 256 = 24
+bloque = 24/32 = 0
+
+RTA: el byte 280 de memoria principal corresponde al bloque 0 de la caché
