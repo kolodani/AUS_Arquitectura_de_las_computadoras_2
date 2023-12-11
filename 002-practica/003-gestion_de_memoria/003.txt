@@ -1,0 +1,12 @@
+3 - Calcular la capacidad de almacenamiento total en bits que se necesita para
+    implementar una memoria caché de correspondencia directa de 128 KBytes de
+    datos, bloques de 4 palabras y direcciones de 32 bits. Considerar que cada bloque
+    de la caché necesita un campo de etiqueta (del tamaño adecuado) y un campo de
+    validez (de 1 bit).
+
+direcciones de 32 bits, compuesta de:
+2 bits de byte
+2 bits de palabra
+17 bits de indice
+10 bits de etiqueta
+1 bit de validez
