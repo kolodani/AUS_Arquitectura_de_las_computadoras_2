@@ -1,0 +1,50 @@
+6 - Dada la siguiente secuencia de referencias a palabras de memoria:
+    1, 4, 8, 5, 20, 17, 19, 56, 9, 11, 4, 43, 5, 6, 9, 17
+    a) Si la caché es de correspondencia directa de 16 bloques y 4 bytes por
+    bloque que inicialmente está vacía, etiquetar cada referencia de la lista como
+    un acierto o fallo y mostrar el contenido final de la caché.
+    b) Si la organización de la caché cambia a correspondencia directa con 16
+    bytes por bloque (4 palabras) y un tamaño total de 16 palabras, ¿cómo son los
+    aciertos y fallos si la caché estaba vacía? ¿Cómo queda luego?
+    c) ¿Cúal es la tasa de fallos para a) y b)? ¿Qué se puede concluir de los
+    valores que obtuvo?
+
+a) referencia:
+1 - fallo
+4 - fallo
+8 - fallo
+5 - fallo
+20 - fallo
+17 - fallo
+19 - fallo
+56 - fallo
+9 - fallo
+11 - fallo
+4 - fallo
+43 - fallo
+5 - acierto
+6 - fallo
+9 - acierto
+17 - acierto
+
+b) referencia:
+1 - fallo
+4 - fallo
+8 - fallo
+5 - acierto
+20 - fallo
+17 - fallo
+19 - acierto
+56 - fallo
+9 - fallo
+11 - acierto
+4 - fallo
+43 - fallo
+5 - acierto
+6 - acierto
+9 - fallo
+17 - acierto
+
+c) tasa de fallos:
+en la a) 13 fallos de 16 referencias, 13/16 = 0.8125
+en la b) 10 fallos de 16 referencias, 10/16 = 0.625
