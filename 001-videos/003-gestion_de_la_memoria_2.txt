@@ -1,0 +1,52 @@
+--- FUNCIONAMIENTO DE LA MEMORIA CACHE ---
+* Adquisicion
+    - ¿Cuanto se lleva un conjunto de MP a una linea de cache?
+        * En fallo
+            - Se trae la linea sobre la que se quiera leer o escribir
+        * En fallo de lectura (No-write allocate)
+            - Se trae la linea solo cuando se quiere leer
+        * En fallo de escritura (Write allocate)
+            - Se trae linea cuando se quiere escribir
+
+
+--- FUNCIONAMIENTO DE LA MEMORIA CACHE ---
+* Actualizacion
+    - ¿Cuando se actualiza el bloque de MP?
+        * Escritura directa (Write-through)
+            - Simultanemante se escribe en Cache y MP
+            - Optimizacion de la escritura
+                * Buffer de escritura
+                    - Evita las paradas de escritura de la CPU
+        * Post escritura (Write back)
+            - Se actualiza la MP cuando se reemplaza la linea de MC
+            - Mecanismo para indicar inconsistencia entre Cache y MP
+                * bit extra para indicar linea modificada (M)
+
+--- FUNCIONAMIENTO DE LA MEMORIA CACHE ---
+* Reemplazo
+    - ¿Que linea se desecha cuando hace falta espacio para otra?
+        * Aleatoria (Ramdom)
+            - Linea a reemplazar se elige de forma Aleatoria
+        * Menos recientemente utilizada (LRU o pseudo-LRU)
+            - Siguiendo el principio de localidad se reemplaza la linea que mas tiempo tiene sin ser referenciada
+        * Menos frecuentemente utilizada (LFU)
+            - Se reemplaza la linea que menos haya sido menos referenciada
+        * Primeras entradas, primeras salidas (FIFO) no se usa normalmente
+            - Se sigue un orden de reemplazo atendiendo al orden en que se han ido utilizando las lineas
+
+--- MEMORIA CACHE MULTINIVEL ---
+* Esquema basico
+    - La diferencia entre velocidades de CPU y MP crece cada dia.
+    - Se pueden crear sistemas de memoria con varios niveles de MC que tienen normalmente distintos tamaños y velocidades.
+    - Los sistemas actuales vienen equipados con dos niveles de MC:
+        * El primero integrado dentro del propio procesador con tamaño pequeño:
+            Los aaccesos a la cache tienen un ciclo de reloj igual al de la CPU.
+        * El segundo nivel tiene gran tamaño para conseguir que el numero de accesos a MP sea el menor posible.
+
+--- MEMORIA CACHE MULTINIVEL ---
+* Organizacion de los datos
+    - Las MC pueden almacenar tanto datos como instrucciones.
+    - Existen diferentes tipos de MC:
+        * Cache de datos: solo almacena datos.
+        * Cache de instrucciones: solo almacena instrucciones.
+        * Cache unificada o mixta: silmutaneamente exixten datos e instrucciones.
