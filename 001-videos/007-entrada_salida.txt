@@ -1,0 +1,43 @@
+--- INTRODUCCION ---
+* Enfasis en: rendimiento, diversidad, confiabilidad, capacidad de expansion y costo
+* Rendimiento, dependencias: caracteristicas del dispositivo, conexion, memoria, buses, disco, red, SO, aplicacion.
+* Parametro de rendimiento:
+    - Latencia (latency): es el tiempo o lapso necesario para que una señal se tranfiera de un punto a otro.
+    - Ancho de banda (bandwidth): es la cantidad de datos que pueden tranportados por unidad de tiempo.
+    - Tiempo de respuesta (elapsed time): Es el tiempo o lapso necesario desde que se envia una orden hasta que se recibe su respuesta.
+    - Productividad (throughput): Cantidad de operaciones que se completan por unidad de tiempo.
+
+--- CONFIABILIDAD, FIABILIDAD, DISPONIBILIDAD ---
+* Confiabilidad: Capacidad de dar un servicio de forma que se pueda tener cierta dependencia.
+Una falla en un sistema se da cuando el comportamiento del mismo (segun es observado por los sistemas con los que interactua) se desvia del esperado
+* Fiabilidad: Medida del tiempo de servicio ininterrumpido sin fallas.
+* Disponibilidad: medida entre el tiempo de servicio sin fallas y la alternancia enttre fallas y restauracion.
+
+--- CONTROLADORES E/S - FUNCIONES ---
+Enlace CPU-Memoria-E/S
+* Enlace E/S
+* Control y temporizacion
+* Comunicacion con CPU
+* Comunicacion con el dispositivo
+* Buffering
+* Correccion de errores
+
+--- CONTROLADOR E/S ---
+* Comunicacion
+    - Control: registro de control (leer, escribir)
+    - Estado: registro de estado (listo, error)
+    - Datos: Registro de datos
+* Acceso a los registros de control, estado y datos
+    - E/S mapeada en memoria: Los registros poseen una direccion dentro del mapa de memoria, ej, MIPS
+    - E/S aislada: Los registros se acceden a traves de instrucciones especiales de E/S y una direccion en el mapa de E/S, ej intel IN OUT
+
+--- BUSES ---
+* Generalidades
+    - Versatiliadad
+    - Bajo costo
+    - Cuello de botella
+    - Velocidad limitada por longitud, ancho de bus, numero de dispositivos
+* Tipos segun su funcion
+    - Control: transfieren señales de control
+    - Datos: Transfieren los datos a leer o escribir
+    - Direcciones: trnsfieren las direcciones de las posiciones de memoria a leer o escribiir, puede utilizarse el mismo bus de datos
