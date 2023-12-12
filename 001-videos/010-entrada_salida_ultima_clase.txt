@@ -1,0 +1,72 @@
+--- DISCOS RIGIDOS ---
+* Plato rotatorio cubierto por superficie magnetica
+* Dos caras
+* Uno o mas platos
+* Cabezas lectoras/escritoras moviles por cara solidarias
+* Almacenamiento no volatil
+* Caras divididas en sectores
+* Conjunto de pistas forman cilindro
+* Codigo de correccion de errores CRC
+* Parametros: velocidad de rotacion, tiempo de posicionado, latencia de rotacion, tiempo de tranferencia
+* Tiempo medido de acceso = Tiempo medio de posicionado + latencia de rotacion + tiempo de transferencia + sobrecarga de controladora
+
+--- MEMORIA FLASH ---
+* No-volatil
+* Latencia comparada con un disco rigido 100 a 1000 veces menor
+* Tamaño pequeño
+* Resistente a golpes
+* Consumo de energia eficiente
+* Costo por GB mayor a disco rigido
+* Lectura y escritura por bloques
+* Desgaste de memoria
+* Controlador para distribuir las escrituras
+
+--- REDUNDANCIA DE DISCOS RAID ---
+RAID: Redundant Array of Independent Disks
+* RAID 0
+    - Sin redundancia
+    - Se usan N discos con N >= 1
+    - Se escriben parte en una parte en cada disco
+    - La capacidad total es la suma de las capacidades de los discos
+    - Se muestra como un gran disco
+    - Mejora el acceso ya que los discos trabajan en paralelo
+* RAID 1
+    - Espejo
+    - Se escriben los mismos datos en ambos discos
+    - Es la redundancia mas cara
+    - La capacidad total es la capacidad del disco mas pequeño
+* RAID 5
+    - Paridad distribuida
+    - N discos
+    - Se escribe una parte en cada uno de los N-1
+    discos
+    - Se escribe la paridad en el disco N
+    - El disco N no es siempre el mismo, para distribuir la paridad
+    - Evita el cuello de botella si se usa unico disco para paridad
+* RAID 6
+    - Idem RAID 5 pero con disco extra para soportar falla de mas de un disco
+* RAID 10
+    - RAID 1 + RAID 0
+    - Se espeja un discos y se genera una unidad logica con el arreglo de espejos
+
+--- REDUNDANCIA DE DISCOS RAID ---
+* Comentarios
+    - Es posible dejar discos como repuesto "stand by spare"
+    - Algunas controladoras soportan cambios en caliente "hot swap"
+
+--- SERVIDORES ---
+* Uso en datacenters
+* Optimizar espacio y Consumo
+* no se necesita tevclado, mouse ni monitor
+* Servers rackeables: 19 pulgadas de ancho y 1,75 pulgadas de unidad de alto
+* Enfasis en disponibilidad, capacidad de expansion, administracion
+* Calidad de componentes
+* Cantidad y tipo de procesadores
+* tamañó maximo de RAM soportado
+* Conexiones de discos
+* Tamaño maximo y cantida maxima de discos soportados
+* Cantidad y capacidad de placas de red
+* RAID
+* Redundancia en general (fuente, procesadores)
+* Capacidad de administracion, identificacion, gestion remota, reinicio
+* Capacidad de autodiagnostico
