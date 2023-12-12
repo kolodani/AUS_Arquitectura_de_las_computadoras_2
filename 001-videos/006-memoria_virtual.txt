@@ -1,0 +1,73 @@
+--- MEMORIA VIRTUAL ---
+* Conceptos
+    - Un computador emplea memoria virtual cuando el espacio de direcciones que utilizan los programas durante su ejecucion es mayor que el espacio de direcciones fisicas en MP.
+    - El espacio de direcciones virtuales ( Intrucciones y datos) que maneja un programa se divide en bloques:
+        - En un instante determinado en MP solo se encuentran unos pocos bloques del programa
+        - El resto de bloques se mantiene en memoria secundaria (area swap del programa)
+        - Se van trayendo nuevos bloques a la MP segun se van necesitando
+    * Objetivo de la memoria virtual:
+        - Permite disponer de un espacio de direcciones superior al real
+        - Permite compartir eficientemente la memoria (entornos multiproceso)
+
+--- MEMORIA VIRTUAL ---
+* Conceptos
+    - La CPU produce direcciones virtuales que se traducen en una direccion fisica que se usa para acceder a MP.
+    - Segun el tipo de traduccin de direcciones:
+        * Memoria virtual paginada
+        * Memoria virtual segmentada
+        * Memoria virtual seg/pag
+
+--- MEMORIA VIRTUAL ---
+* Memoria virtual paginada
+    - Espacio virtual de direcciones:
+        * Se divide en paginas de tamaño fijo
+        * Direccion virtual
+            - Tamaño de una pagina: 2^d palabras
+            - N maximo de paginas(por proceso): 2^p paginas
+            |numero de pagina|desplazamiento|
+            \    p bits     / \   d bits    /
+    - Espacio fisico de direcciones:
+        * se divide en marcos de pagina del mismo tamaño que una pagina
+        * Direccion fisica:
+            - Tamaño de un marco: 2^d palabras
+            - N total de marcos en MP: 2^m marcos
+            |numero de marco|desplazamiento|
+            \    m bits    / \   d bits    /
+
+--- MEMORIA VIRTUAL ---
+* Traduccion de direcciones
+    - Es necesario un mecanismo de correpondencia para conocer en que marco de pagina (M) de MP esta ubicada una derterminada pagina de memovia virtual (P).
+
+--- MEMORIA VIRTUAL ---
+* Tabla de paginas
+    - Existe una tabla (TP) por caa proceso J.
+        * La TP contiene una entrada por cada posible del proceso J: 2^p entradas por proceso.
+        * la entrada P-esima de TP contien el marco de pagina M donde esta ubicada la pagina P (si esta en MP)
+        * La TP de un determinado proceso J esta apuntada por un registro base asignado a ese proceso
+    - Problemas al almacenar la TP en MP:
+        * La TP puede de ser de gran tamaño (4 Mb en el ejemplo)
+        * Se requieren dos accesos a MP por cada referencia: se duplica el tiempo de acceso.
+    - Uso de registros de limites, tablas de hash, varions niceles de tablas, paginar las tablas.
+    - Maquina actuales incorporan una cche especial que guarda las traducciones mas recientes: TLB (tabla lookaside buffer).
+
+--- MEMORIA VIRTUAL ---
+* Buffer de traduccion de direccion (TLB)
+    - Gracias al principio de localidad, las traducciones de direcciones se bvuelven a utilizar en breve
+    - El TLB es una memoria cache especial que permite mejorar las prestaciones. al almacenar las traducciones mas recientes.
+    - Cada entrada en el TLB consta de tres partes:
+        * el numero de pagina virtual
+        * el numero de marco
+        * Varios bits de control
+    - Implementacion de un TLB
+
+--- MEMORIA VIRTUAL ---
+* Funcionamiento
+    - Politicas de emplazamiento: Todas las paginas son de igual tamaño y coinciden en tamaño con los marcos de pagina
+        * Una pagina se puede ubicar en cualquier marco de pagina libre
+    - Politicas de reemplazo de paginas: cuando no hay ningun marco de pagina libre se debe reemplazar alguna de las paginas de MP
+        * Principales algoritmos: Aleatorio, FIFO, LFU, LRU
+    - Politicas de actualizacion de la MS:
+        * Necesario mantener la coherencia entre MP y MS:
+            - Cuando se modifica una pagina en Mp es necesario actualizar es misma pagina en MS
+        * Se emplea la politica de actualizacion de post-escritura:
+            - Una pagina modificada se actualiza en MS solo cuando se reemplaza.
