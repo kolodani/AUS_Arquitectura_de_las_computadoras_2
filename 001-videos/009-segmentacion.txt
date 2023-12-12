@@ -1,0 +1,208 @@
+--- SEGMENTACION ---
+Perspectiva General
+
+Tecnica utilizada para optimizar el tiempo de ejecucion de procesos que se realizan mediante la repeticion de una secuencia de pasos basicos.
+Permite la ejecucion de procesos concurrentemente.
+* Fundamento: separa el proceso en etapas y ejecutar cada etapa en una recurso independiente
+* Objetivo: mejorar la prodictividad, aumentando el numero de instrucciones ejecutadas por unidad de tiempo
+* Funcionamiento: cuando una etapa del proceso termina, el recurso liberado puede empezar a ejecutar la misma etapa del siguiente proceso.
+    - Se consigue la ejecucion de varios procesos en paralelo cada uno en una etapa diferente. ILP: Instruction Level Parallelism
+    - Las etapas son ejecutadas secuencialmente
+
+--- SEGMENTACION: FUNCIONAMIENTO IDEAL ---
+Proceso segmentado vs Proceso secuencial
+* Ventajas
+    - la segmentacion, aunque no mejora la latencia de un solo proceso, mejora el rendimiento o productividad (throughput) de una tarea con muchos procesos
+    - Varios procesos se ejecutan "en paralelo".
+* Restricciones
+    - La razon de segmentacion esta limitada por la etapa mas lenta.
+    - La aceleracion maxima posible + numero de etapas de segmentacion.
+    - Etapas de segmentacion desequilibradas => reduccion de productividad
+
+--- SEGMENTACION: FUNCIONAMIENTO IDEAL ---
+* Un procesador segmentado perfecto consigue ejecutar una instruccion por ciclo.
+* La segmentacion mas evidente consta de tres etapas:
+    - Obtener instruccion (fetch)
+    - Decodificar instruccion (decode)
+    - Ejecutar instruccion (execute)
+* La frecuencia de funcionamiento es mayor si el numero de etapas de segmentacion se incrementa. aunque:
+    - La segmentacion fina es muy dificil
+    - Cada nueva etapa añade el retardo de un registro
+    - La independencia entre etapas es mas dificil de conseguir
+
+--- SEGMENTACION: SEGMENTACION DE INSTRUCCIONES ---
+* Ejemplo: segmentacion de instrucciones con 5 etapas (MIPS)
+    - IMen: etapa IF
+        * Obtener instruccion
+        * Acceso a la memoria de instrucciones
+    - Reg: etapa ID
+        * Decodificar instruccion
+        * Lectura de operandos, carga de registros
+    - ALU: etapa EX
+        * Ejecutar instruccion o bien
+        * Calcular direccion efectiva memoria
+    - DMem: etapa MEM
+        * Acceso a memoria o bien
+        * Escribir en PC la direccion de salto
+    - Reg: etapa WB
+        * Escribir en un registro el resultado de la operacion
+
+--- SEGMENTACION: LOAD VS OPERACION ENTRE REGISTROS ---
+* Existen conflictos estructurales
+    - hay dos instrucciones que intentan acceder a memoria al tiempo
+    - hay dos instrucciones que intentan escribir en el banco de registos al mismo tiempo y solo existe un puerto de escritura.
+
+--- SEGMENTACION: CONSIDERACIONES DE DISEÑO ---
+* cada unidad funcional pueda usarse solo una vez por instruccion. Deben aparecer dos unidades de memoria.
+* Cada unidad funcional se utiliza en la misma etapa para todas las instrucciones:
+    - Load usa el puerto de escritura en Registros dutante su 5ª etapa
+    - Las operaciones entre Registros usan el puesto de escritura en Registros durante su 4ª etapa
+* Soluciones posibles: paradas entre etapas, retraso de la escritura en registro, ...
+
+--- SEGMENTACION: AÑADIR EL CONTROL ---
+* Todas las instrucciones tardan los mismos ciclos de reloj.
+    - La secuencia de la instruccion esta implicita en la estructura del pipeline.
+    - No hay un control especial para la duracin de la instruccion (no hay FSM).
+* Toda la informacion de control se calcula durante la decodificacion, y se envia hacia delante a traces de los registros de segmentacion.
+* Los valores de las lineas de control son los mismos que los calculados en el control uniciclo.
+
+--- SEGMENTACION: CONFLICTOS EN FUNCIONAMIENTO REAL ---
+* Las caudas que pueden reducir el rendimiento en un procesador segmentado de instrucciones son tres:
+    - Riesgos estructurales:
+        * Se intenta usar el mismo recurso de dos maneras diferentes al mismo tiempo.
+        * El hardware impide una cierta combinacion de operaciones.
+    - Riesgos por dependencia de datos:
+        * Se intenta usar un dato antes de que este este disponible.
+        * El operando de una instruccion depende del resultado de otra instruccion precedente que todacia no se ha obtenido.
+    - Riesgos de control:
+        * Se intenta tomar una decision antes de evaluarse la condicion.
+        * Si se salta, las instrucciones posteriores no deben ejecutarse(o al menos. no deben finalizar).
+
+--- SEGMENTACION: CONFLICTOS EN FUNCIONAMIENTO REAL ---
+¿Todos estos riesgos se puenden solucionar? si
+¿Como? Esperando
+* Cuando se detecta un riesgo, la solucion mas simple es parar la segmentacion (stall the pipeline) hasta que desaparezca el riesgo.
+    - Las instrucciones que preceden a la causante del riesgo pueden continuar
+    - Las instrucciones que causa el riesgo y siguientes no continuan hasta que desaparece el riesgo.
+* Se necesita que el control de la segmentacion (pipeline) sea capaz de:
+    - Detectar las causas de riesgo.
+    - Decidir acciones que resuelvan el riesgo (por ejemplo, esperar)
+
+--- SEGMENTACION: RIESGOS ESTRUCTURALES ---
+* Casos que se pueden presentar. Accesos simultaneos a:
+    - Memoria (si es Von Neuman, unica para datos e instrucciones)
+    - Unidades funcionales
+    - Registros internos
+
+--- SEGMENTACION: RIESGOS ESTRUCTURALES ---
+* Soluciones:
+    - introducir esperas
+    - Duplicar recursos o separar memoria de datos de la memoria de instrucciones (Harvard)
+
+--- SEGMENTACION: RIESGOS POR DEPENDENCIA DE DATOS ---
+* Dependencia que se presenta para 2 instrucciones i y j, con i ejecutandose antes que j:
+    - RAW (Read After Write): la instruccion posterior j intenta leer una fuente antes de que la instruccion anterior i la haya modificado.
+    - WAR (Write After Read): la instruccion j intenta modificar un destino antes de que la instruccion i lo haya leido como fuente.
+    - WAW (Write After Write): la instruccion j intenta modificar un destino antes de que la instruccion i lo haya hecho(se modifica el orden normal de escritura)
+
+--- SEGMENTACION: RIESGOS POR DEPENDENCIA DE DATOS ---
+* Aparecen problems al poder empezar la siguiente instruccion antes de que la primera haya terminado.
+
+--- SEGMENTACION: RIESGOS POR DEPENDENCIA DE DATOS ---
+* Soluciones:
+    - "Adelantar" (forward) el resultado de una etapa a las siguientes.
+    - Definir adecuadamente la secuencia Read/Write (lainstruccion "add r4,r1,r3" funciona correctamente si en la etapa WB, Write se realiza en la 1ra mitad del ciclo y read en la 2da)
+
+--- SEGMENTACION: RIESGOS POR DEPENDENCIA DE DATOS ---
+* Necesidades hardware para adelantar resultados:
+    - Multiplexores adicionales donde se vaya a recibir el dato (por ejemplo, en la entrada de datos de la ALU)
+    - Buses extra entre registors internos y multiplexores.
+    - Comparadores entre los operandos de una instruccion y los operandos destino de instuccion previas.
+
+--- SEGMENTACION: RIESGOS POR DEPENDENCIA DE DATOS ---
+* Los riesgos pueden persistir incluso con adelantamiento de datos
+    - ej: tras la instruccion LOAD se puede evitar los riesgos en AND y en OR con adelantamiento de datos, pero no de SUB (no puede adelantar resusltados a etapas qeu son de tiempos anteriores)
+
+--- SEGMENTACION: RIESGOS POR DEPENDENCIA DE DATOS ---
+* Soluciones:
+    - Insertar un ciclo de espera (stall) en el ciclo 3, para la instruccion SUB yh siguientes
+    - Insertar una operaion NOP detras del Load (es lo mas utilizado, lo puede automatizar el compilador sin necesidad de mas hardware)
+
+--- SEGMENTACION: RIESGOS POR DEPENDENCIA DE DATOS ---
+* Unidad de adelantamiento de datos (forwarding)
+    - Se debe detectar el riesgo y luego "anticipar" el valor a su destino
+    - Se agrega un bloque combinacional para detectar el riesgo y multiplexores para adelantar los datos oportunamente
+
+--- SEGMENTACION: RIESGOS POR DEPENDENCIA DE DATOS ---
+* Unidad de adelantamiento de datos (forwarding)
+    - Se debe detectar el riesgo y luego "anticipar" el valor a la ALU
+    - Existen 4 riesgos potenciales
+
+--- SEGMENTACION: DETECCION DE RIESGOS INSALVABLES ---
+* Unidad de deteccion de riesgos (hazard detecrion unit)
+    - Para cuando el adelantamiento no resuelve los riesgos (caso de load y uso del registro destino en la siguiente instruccion)
+nota: todo esto no es necesario si el compilador / ensamblador añade un NOP despues del LOAD con riesgo
+
+--- RIEGOS DE CONTROL (INSTRUCCIONES DE SALTO) ---
+* Las instrucciones de salto pueden suponer una alteracion del orden secuencial de ejecucion
+    - IMen: etapa IF
+        * Obtener instruccion
+        * Acceso a la memoria de instrucciones
+    - Reg: etapa ID
+        * Decodificar instruccion
+        * Lectura de operandos, carga de registros
+    - ALU: etapa EX
+        * Ejecutar instruccion o bien
+        * Calcular direccion efectiva memoria
+    - DMem: etapa MEM
+        * Acceso a memoria o bien
+        * Escribir en PC la direccion de salto
+    - Reg: etapa WB
+        * Escribir en un registro el resultado de la operacion
+* No se sabe si el salto es efectivo hasta la etapa de ejecucion y no se actualiza la direccion destino (caso de que sea efectivo) hasta la cuarta etapa => Perdida de 3 ciclos
+* Mejora: adelantar el calculo del destino (target) PC+inmediato y adelantar la resolucion de la condicion (y actualizar el PC) a la 2da etapa
+
+--- RIEGOS DE CONTROL (INSTRUCCIONES DE SALTO) ---
+* Cuando se decide saltar, ya se estan ejecutando otras instrucciones en el cause segmentado => Se necesita incluir hardware para vaciar (flushing) el pipeline
+
+--- RIEGOS DE CONTROL (INSTRUCCIONES DE SALTO) ---
+¿Que hacer con las siguientes instrucciones a la de salto condicional?
+1. Esperar hasta que la direccion y condicion del salto esten definidas
+    - Conviene conocer la direccion de salto y la condicion tan pronto como sea posible.
+2. Salto retardado, la(s) instruccion(es) posterior(es) siempre se ejecuta(n).
+    - El complilador rellena con instrucciones validas los huecos de retardo.
+3. Predecir si se va a saltar o no.
+    - Se ejecutan especulativamente, en caso de error se debe "vaciar" el procesador.
+4. Anticipar la direccion mas probable para el salto (BTB).
+    - Se ejecutan especulativamente, se almacena en una cache la direccion del ultimo salto
+5. Ejecutar todos los caminos
+    - Implica la duplicacion del hardware
+6. Ejecucion con predicados
+
+--- RIESGOS DE CONTROL. SALTO RETARDADO ---
+* La siguiente instruccion al salto siempre se termina de ejecutar, se salto o no.
+El compilador utiliza tres estrategias para buscar una/varias instrucciones de relleno:
+* DEL BLOQUE BASICO
+    - Operacion valida si la instruccion no afecta a la condicion del salto. siempre se realiza trabajo util.
+* SI SALTO PROBABLE DEL BLOQUE DESTINO
+    - Operacion valida siempre que r2 no se utilice como fuente y sea modificada como destino en el bloque secuencial(CORRECTO)
+* SI SALTO PROBABLE DEL BLOQUE SECUENCIAL
+    - Operacion valida siempre que r6 no se utilice como fuente y sea modificada como destino en el bloque destino (INCORRECTO)
+
+--- RIESGOS DE CONTROL. PREDECIR EL SALTO ---
+* Prediccion estatica: siempre predice el mismo sentido del salto.
+    - Ejecuta especulativo hasta que se resuelve la condicion (normalmente, ciclo 3-4)
+    - En caso de error debe eliminar los resultados especulativos
+        * Prediccion efectiva(E), el salto se realiza
+        * Prediccion no efectiva (NE), el salto no se realiza
+        * Prediccion NE si el salto es adelante y E si es hacia atras
+* Prediccion dinamica: cambia la prediccion en funcion de la historia del salto.
+    - Utiliza una pequeña memoria asociada a cada direccion de salto (BHT, Branch History Table)
+
+--- SEGMENTACION: TRATAMIENTO DE EXCEPCIONES Y MEJORAS ---
+* ¿Como afecta a la segmentacion el tratamiento de excepciones(interrupciones, desbordamiento aritmeticos,  peticiones de E/S, servicios del sistema operarivo, uso de instrucciones no definidas, mal funcionamientos de la circuiteria, etc)?
+    - Basicamente detectarlo y vaciar el pipeline para dar el control a alguna rutina de tratamiento de excepciones
+* ¿Como mejorar aun mas la segmentacion?
+    - Super-segmentacion (implica segmentacion en operaciones aritmeticas)
+    - Superescalares (replicar rutas de datos)
+    - Planificacion dinamica del pipeline
