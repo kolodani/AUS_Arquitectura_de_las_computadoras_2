@@ -1,0 +1,70 @@
+--- IMPLEMENTACION MULTICICLO ---
+* Decicaremos varios ciclos a cada instruccion
+* Necesitaremos
+    - Mas multiplexores
+    - Mas registros
+* Cada dato y resultado estara en un registro para que no se destruya al terminar el ciclo
+
+--- CPI MULTICICLO ---
+* Hemos repartido las operaciones de forma que el tiempo maximo de computacion es el de una unidad funcional
+* La unidades mas lentas necesitan 2 ns para completar su funcionamiento
+* Por tanto el ciclo de reloj durara 2 ns
+* Por ejemplo, una operacion aritmetica necesita 4 ciclos = 8 ns
+
+--- CONTROL CABLEADO ---
+* Construiremos una maquina de estado finitos (automata de Moore)
+* El camino de datos multiciclo se controla con las salidas de la unidad de control (la maquina de estados)
+* Las entradas de la unidad de control seran
+    - Los bits de la instruccion
+    _ Los indicadores internos
+* maquina de estados finitos:
+    - Cada estado de la maquina representa una etapa y tarda un ciclo de reloj
+    - Los dos primeros pasos son identicos para todas las instrucciones
+    - A partir de la tercera etapa depende del codigo de operacion
+    - Despues de la ultima etapa la maquina debe volver al estado inicial
+
+--- CONTROL MICROPROGRAMADO ---
+* Cada grupode señales causa la ejecucion de una operacion basica especifica: microoperacion
+* La interpretacion y ejecucion de una instruccion da lugar a una secuencia de operaciones maquina basicas (microoperaciones), cada una controlada por un grupo de señales de control, microinstruccion.
+* Una secuencia de microinstrucciones constituyr un microprograma.
+* El codigo de operacion de una instruccion maquina, cuando es decodificado, señala la microrrutina apropiada incluida en la memoria microprogramada.
+* Las microinstrucciones suelen estar ubicadas en una ROM o en una PLA, por lo que pueden asignarse direcciones a la microinstrucciones.
+
+--- SECUENCIA DE ESTADOS ---
+* Tras terminar una instruccion se ha de retornar al estado 0
+* Las instrucciones solo tienen algunos estados en comun, despues divergen
+* Esta divergencia puede ocurrir en varios lugares en el diagrama de estados
+* Necesitamos contemplar estos casos
+
+--- SECUENCIA DE ESTADOS ---
+* Cada tabla de envio esta asociada a un estado del que no tiene un unico estado destino
+* En el caso general crearemos una tabla (ROM/PLA) para cada estado con multiples estados-destino
+* En general, en un procesador complejo, los estados se seleccionaran de forma secuencial con pocas excepciones
+
+--- PROCESAMIENTO DE EXCEPCIONES ---
+* Una excepcion es un suceso inesperado que se produce en el procesador, por ejemplo el desbordamiento aritmetico
+* Una interrupcion es un suceso que provoca un cambio inesperado, pero se produce externamente al procesador
+* Ejemplo de implementacion de excepciones:
+    - Instruccion indefinida
+    - Desbordamiento aritmetico
+* Metodos ara comunicar la causa de una excepcion
+    _ Registro de estado (denominado refgistro Causa o Cause Register), que contiene un campo que indica la razon de la excepcion. es el metodo utilizado en la arquitectura MIPS. Se utiliza un unico punto de entrada al sistema operativo para toda las excepciones.
+    - Interrupciones vectorizadas. la direcciones a la que se tranfiere el control viene determinada por la causa de la excepcion.
+
+--- PROCESAMIENTO DE EXCEPCIONES ---
+* Acciones a realizar:
+    - Guardar la direccion de la instruccion causante en el registro contador de programa de la excepcion (EPC)
+    - Tranferir el control al sistema operativo en alguna direccion especifica
+    - El sistema operativo ejecuta una rutina especifica
+    - Finalizar el programa o continuar con sus ejecucion, usando EPC para saber donde retomar la ejecucion
+
+--- PROCESAMIENTO DE EXCEPCIONES ---
+* Ejemplo de implementacion:
+    - Saltaremos a la direccion 0xC0000000
+    - Necesitamos lo siguientes registros
+        * Un registro de 32 bits para el EPC
+        * Un registro de 1 bit para el registro de causa
+    - Y las señales de control
+        * Escribir en EPC
+        * Escribir en Registro de Causa
+        * Tipo de excepcion (1 bit, pues solo consideramos dos tipos de excepciones)
