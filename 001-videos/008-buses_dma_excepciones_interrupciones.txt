@@ -1,0 +1,149 @@
+--- BUSES - TIPOS INTERCONEXION ---
+* Procesador - Memoria
+    - Diseño especifico
+    - Propietario
+    - Corta longitud
+* Backplane
+    - Diseño estandar
+    - Variedad de dispositivo
+    - Medida longitud
+* E/S
+    - Diseño estantar
+    - Variedad de dispositivo
+    - Mayor longitud
+
+--- BUSES - TIPOS SEGUN SINCRONIZACION ---
+* Sincronos
+    - Poseen una señal de reloj
+    - Sencillos
+    - Todos los elementos deben trabajar a la misma frecuencia
+    - Problemas por sesgo de reloj
+* Asincronos
+    - No poseen señal de reloj
+    - Protocolo de handshake
+    - Mayor complejidad
+    - Buses mas largos
+    - Los elementos pueden trabajar a distintas velocidades
+
+--- BUSES - ANCHO DE BANDA ---
+* Cantidad de lineas de datos
+* Multiplexacion de lineas de datos y direcciones
+* Transferencia por bloques
+* Frecuencia de reloj (en sincronicos)
+
+--- BUSES - ACCESO ---
+* Obtencion de acceso
+    - Unico maestro: hay un unico elemento que decide cuando utilizar el bus, el procesador, no hay necesidad de arbitraje.
+    - Multiples maestros: hay varios elementos que requieren utilizar el bus, se necesita arbitrar sobre quien sera el proximo en utilizarlo.
+
+--- BUSES - ARBITRAJE ---
+* Tipos
+    - Centralizado: el arbitraje se realiza por un elemento central
+    - Distribuido: el arbritaje se realiza en forma conjunta y distribuida
+* Clases Centralizado
+    - En serie (daisy chain)
+        * Simple
+        * Mayor prioridad el mas cercano al arbitro
+        * No se puede asegurar la imparcialidad
+    - Paralelo centralizado
+        - Mas potente
+        - Requiere un arbitro mas complejo
+        - Requiere mas lineas
+        - Ejemplo PCI
+
+--- BUSES - ARBITRAJE ---
+* Clases descentralizado
+    - Distribuido por autoseleccion
+        * Multiples lineas de seleccion
+        * Cada dispositivo que desea acceder al bus escribe su direccion
+        * Cada dispositivo leee la direccion y decide cual es el mas prioritario
+        * Ejemplo NuBus de Apple Macintosh
+    - Distribuido por deteccion de colision
+        * Los dispositivos que dean transmitir transmiten
+        * Se verifica si hubo colision
+        * En caso de colision se emplea un algoritmo de seleccion
+        * Ejemplo Ethernet
+
+--- E/S PROGRAMADA - CONCEPTO ---
+* CPU interrroga a modulo de E/S
+* Si esta listo se realiza la E/S
+* Si no esta listo espera e interroga nuevamente
+
+--- E/S PROGRAMADA - RESULTADO ---
+* Simple
+* Util para dispositivos de E/S de bajo ancho de banda y frecuencia regular y baja o cuando el procesador no tiene tareas adicionales
+* Sin hardware adicional
+* Procesador malgastado en esperas
+* Dificulta manejo de prioriedades
+
+--- INTERRUPCIONES - CONCEPTO ---
+* CPU solicita E/S
+* CPU cambia de tarea
+* Modulo E/S interrumpe cuando termina
+
+--- INTERRUPCIONES - COMPLEJIDADES ---
+* Nueva linea de entrada a la CPU
+* Interrupcion es un evento asincronico
+    - No asociada a una instruccion
+    - No impide la finalizacion de la instruccion actual
+    - CPU chequea si existen interrupciones pendientes despues de cada instruccion
+* Necesidad de informacion adicional
+    - Interrupciones vectorizadas
+    - Registro causa
+
+--- INTERRUPCIONES - COMPLEJIDADES ---
+* Inhibicion y enmascaramiento
+* Prioriedades
+* Rutina de atencion a interrupcion
+    - Cambio de contexto
+    - Guardar estado, parte por hardware, parte por software
+    - Paso a modo supervisor
+    - Retorno
+
+--- INTERRUPCIONES - RESULTADO ---
+* Libera al procesador de las esperas
+* Util paara dispositivos de E/S de bajo ancho de banda y frecuencia irregular, ej. mouse
+* Mayor complejidad
+* Mayor costo
+* E/S mas lenta (posiblemente)
+
+--- EXCEPCIONES - MIPS ---
+* Excepcion: cualquier evento inesperado que puede cambiar el flujo del programa
+* Interrupcion: caso particular de excepcion, proviene del exterior del procesador
+
+--- DMA - CONCEPTO ---
+* Nuevo actor, el controlador de DMA
+* El procesador programa al controlador DMA, envia sentido, posicion base, cantidad de bytes y direcciones de dispositivo
+* El controlador DMA realiza la transferencia entre el dispositivo de E/S y memoria sin intervencion del procesador
+* El controlador DMA envia una interrupcion al procesador para notificar que la operacion de E/S se completo
+
+--- DMA - COMPLEJIDADES ---
+* Se requiere interrupciones
+* Controlador de DMA maestro de bus
+    - Necesidad de arbitraje
+    - Competencia por el bus
+* Memoria Virtual
+* Direcciones virtuales mapeadas a fisicas
+    - Enviar direccion virtual implica traduccion dentro del controlador DMA
+    - Enviar direcciones fisicas implica que se parta la transferencia en transferencias acotadas dentro de una pagina
+    - El SO debe asegurar que las paginas no cambien de ubicacion
+
+--- DMA - COMPLEJIDADES ---
+* Memoria cache
+    - Lectura de momoria de dato actualizado en cache, dato obsoleto
+    - Escritura de memoria de un dato ubicado tambien en cache, coherencia
+    - Encaminar E/S a traves de la cache
+    - SO para invalidar o vaciar la cache
+    - Circuiteria para invalidar o vaciar la cache
+
+--- DMA - RESULTADO ---
+* Libera al procesador de la transferencia
+* util para dispositivos de E/S de gran ancho de banda, ej. disco rigido
+* Mayor complejidad
+* Mayor costo
+
+--- PROCESADORES DE E/S - CONCEPTO ---
+* Controlador DMA mas avanzado
+* El procesador envia una serie de ordenes de E/S, denominado programa de E/S
+* El procesador de E/S ejecuta todo el programa de E/S e interrumpe al procesador cuando finaliza
+* El procesador se libera aun mas de trabajo
