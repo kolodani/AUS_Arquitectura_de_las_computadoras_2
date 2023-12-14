@@ -1,0 +1,157 @@
+--- PROCESADORES AVANZADOS ARQUITECTURA DE GPU ---
+--- OBJETIVO ---
+* Entende que se una GPU (Graphics Processing Unit)
+* Comparar las arquitecturas de CPU con GPU
+* Entender la importancia de la programacion masiva paralela y las motivaciones para GPGPU (General Programing on GPU)
+* Presentar un caso de uso basico: Nvidia Gforce
+* Aprender conceptos basicos para programar GPUs con CUDA y OpenCL
+
+--- PIPELINE GRAFICO CONCEPTUAL ---
+
+                                                        Texturas
+                                                           |
+                                                           |
+Vertices --> Acoplamiento de primitivas --> Rasterizacion --> Interpolacion,
+                                                                Texturas,
+                                                                Coloracion
+
+--- ETAPAS DE UN PIPELINE GRAFICO ---
+
+* Interfaz GPU
+        Vertices
+- Procesadoe de vertices programables (Vertex Shader)
+        Vertices Transformados
+* Acoplamiento de primitivas y rasterizacion
+        Fragmentos
+- Procesador de fragmentos programable (Pixel Shader)
+        Fragmentos Transformados
+* Operaciones raster
+        Pixeles
+* Framebuffer
+
+- (Etapas programables (Shaders))
+
+--- MOTIVACION PARA USAR GPU VS CPU ---
+* No se puede segguir aumentando el clock: debido a limites fisicos de los materiales actuales.
+* Limites de integracion: no se pueden hacer transistores mas pequeños por problemas de fabricacion.
+* Restricciones de energia y calor: limites tecnologicos (CMOS) y elevado consumo.
+Limites al paralelismo ILP: PIPELINES mas largos terminana con menor rendimiento.
+* Limite a manycore: no se pueden integrar demasiados cores en una sola pastilla (128 cores AMD Epic, 2019).
+
+--- ASPECTOS IMPORTANTES DE LA GPU ---
+* Poseen un pipeline grafico.
+* Utilizan unidades aritmeticas programables (Shaders).
+* Fueron pensadas desde el inicio SIMD.
+* soportan muchos flujos de ejecucion (threads) por eso tambien se las llama SIMT(Single Instruction Multiple Threads).
+* Pueden generalizar los Shaders (unified architecture).
+* Tienen un jerarquia de memoria compleja.
+* Aprovechan al maximo el principio de localidad.
+* Gran velocidad de acceso a memoria (DDR5).
+
+--- COMUNICACION GPU-CPU ---
+* El CPU o CPUs y la memoria principal se comunican con la GPU a traves de un bus PCle (Peripheral Component Interconnect Express).
+* Los multiprocesadores de la GPU y la memoria de la GPU se comunican a traves del bus PCle
+
+--- LIIMITACIONES DE LA GPU ---
+* No puede acceder directamente a la memoria del procesador.
+* Se requiere hacer copia explicita de los datos entre CPU y GPU (memcpy).
+* No se puede hacer uso en el codigo de la salida estandar (printf).
+* Depuracion completa y ardua.
+
+--- FAMILIA DE GPUs NVIDIA ---
+* Gforce: orientada al consumo masivo multimedia (videojuegos, edicion de video, fotografia digital, etc.).
+* Quadro: orientado a soluciones profesionales en workstations 3D (ingenieria, arquitectura, animacion).
+* Tesla: orientado a la computacion de alta prestaciones (HPC)
+
+--- APLICACIONES DE LA GPU ---
+* GPGPU: usar la GPU para aplicaciones de proposito general.
+* Las aplicaciones que mejor se adaptan:
+    - Trabajan sobre grande svectores de datos
+    - Tienen paralelismo de grano fino SIMD
+* Dominios adecuados de aplicacion:
+    - Algebra lineal (producto escalar y suma de matrices)
+    - Procesamiento de señales (digital image processing)
+    - Mecanica computacional (computational fluidic dynamics)
+    - Inteligencia artificial
+
+--- DESAFIOS PARA PROGRAMAS GPU ---
+* La programacion CPU y GPU no son compatibles.
+* Todo dato a procesar debe convertirse en texturas para aprovechar el procesamiento por shaders.
+* Se usa la tecnica render-to-texture para escribir ya que no se puede acceder trivialmente a la memoria.
+* El calculo se realiza mediante flujos de procesador de fragmentos (pixel shader threads).
+* Se hacen necesarios estandars como CUDA u OpenCL.
+
+--- CASO NVIDIA G80 ---
+* 2006 aparece la arquitectura G80 (Tesla).
+* Utiliza shaders unificados: no diferencia entre vectors o pixel shaders a nivel procesadores (SP).
+* Se orienta a flujos masivos (massive threads).
+* Utiliza IEEE 754 (floats).
+* Pipeline grafico con soporte DirectX 10 y OpenGL 3.3
+* Utiliza dos etapas: carga y control de flujos.
+* Los flujos se diferencian por su clasificacion.
+* El procesamiento se realiza en bloques de 16 SPs
+* Comparten cache y texturas.
+
+--- USO DE SHADERS UNIFICADOS ---
+* Ejemplo: si hay 4 Shaders, A, B, C y D, primero se ejecuta A, el mismo pasa a B, luego a C y finalmente a D.
+
+--- MODELOS DE PROGRAMACION GPGPU ---
+* OpenGL: es un modelo open source para programacion grafica.
+* Direct3D: es otro modelo de programacion grafica.
+* CUDA: Compute Unified Device Architecture (Nvidia), es un modelo propuetario para programacion general de las GPUs de Nvidia.
+* OpenCL: Open Computing Language (Khronos Group), es un modelo open source multiplataforma para programacion paralela, subconjunto de C99.
+
+--- TERMINOLOGIA CUDA ---
+* Kernels: funciones especiales en ANSI C. Usan palabras claves para poder tratar con el paralelismo.
+* Threads: o flujos, son la unidad de ejecucion basica de un kernel.
+* Grids: grupos de ejecucion de threads pertenecientes a un kernel.
+* Blocks: subconjunto de ejecuciones de threads dentro de un grid.
+
+--- EJEMPLO CPU VS KERNEL DE CUDA ---
+void matrix_add_cpu (float *A, float *B, float *C, int N)
+{
+    int i, j, index;
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < N; j++) {
+            index = i + j * N;
+            C[index] = A[index] + B[index];
+        }
+    }
+}
+
+__global__ void matrix_add_gpu (float *A, float *B, float *C, int N)
+{
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    int j = blockIdx.y * blockDim.y + threadIdx.y;
+    int index = i + j * N;
+    if (i < N && j < N) {
+        C[index] = A[index] + B[index];
+    }
+}
+
+--- SIMILITUDES ENTRE OpenCL Y CUDA ---
+|                 OpenCL                |                CUDA                  |
+| ------------------------------------- | ------------------------------------ |
+| kernel                                | kernel                               |
+| Programa procesador principal         | Programa procesador principal        |
+| NDRange (rango de dimension N)        | Grid                                 |
+| Tarea elemental (work item)           | flujo                                |
+| Work group (grupo de tareas)          | Bloque                               |
+| get_global_id(0);                     | blocldx.x * blockDim.x + threadIdx.x |
+| get_global_id(0);                     | threadldx.x                          |
+| get_global_size(0);                   | gridDim.x * blockDim.x               |
+| get_local_id(0);                      | blockDim.x                           |
+| ------------------------------------- | ------------------------------------ |
+
+--- EJEMPLO DE UN KERNEL OpenCL ---
+__kernel void matrix_add_opencl ( __global const float *A,
+                                  __global const float *B,
+                                  __global float *C,
+                                  int N) {
+                                    int i = get_global_id(0);
+                                    int j = get_global_id(1);
+                                    int index = i + j * N;
+                                    if (i < N && j < N) {
+                                        C[index] = A[index] + B[index];
+                                    }
+                                  }
