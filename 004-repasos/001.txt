@@ -1,0 +1,109 @@
+--- REPASO DE MEMORIA ---
+* La memoria almacena datos y programas que son requeriadas por la CPU
+* En la computadora, estan los datos y programas en la misma memoria
+* hoy cualquier electrodomestico tiene una computadora embebida
+* En casos se separa la memoria de datos y la de programas
+* La memoria de programa es de solo lectura
+* La memoria de datos es de lectura y escritura
+
+* podemos diferenciarlas por coste por bit, velocidad, volatilidad, capacidad, consumo, fiabilidad
+* jerarquia de memoria: registros, cache, memoria principal, memoria secundaria
+* registros, Intel tiene muy pocos registros comparativamento con MIPS
+* MIPS es un procesador menos poderoso que Intel, pero opto por mas registros
+
+* la memoria cache es tener una memoria mas rapida que la principal, pero mas pequeña, para no ir tantas veces a la memoria principal
+* la cache se maneja por hardware, no por software, esto es importante porque el acceso va a ser mas eficiente.
+
+* la memoria principal es la memoria RAM, es la que se usa para ejecutar los programas
+* se accede por hardware y software, aca se necesita si o si la presencia del sistema operativo
+* cuando interviene el sistema operativo, se hace por software porque no se podria soportar por hardware
+
+* la memoria secundaria puede ser el disco rigido o una memoria flash, es mas lenta que la principal, pero es mas barata y tiene mas capacidad ademas de ser no volatil
+* se accede por software, porque no se puede acceder por hardware
+
+* la jerarquia de memoria fluye de niveles inferior a uno superior segun va siendo necesaria
+* toda informacion que esta en un nivel i, tambien va a estar en un nivel i+1
+* Osea si esta en la cache, tambien va a estar en la memoria principal, si esta en la memoria principal, tambien va a estar en la memoria secundaria
+
+* si tengo dos copias del mismo dato en niveles distinto, tengo que tener encuenta que esto generara problemas
+* si modifico un dato en un nivel, tengo que ser conciente de que tengo que actualizarlo en otro nivel
+
+* Principio de localidad temportal y localidad espacial
+* localidad temporal: significa que si acceso a un dato o posicion de memoria, es probable que vuelva a acceder a esa posicion de memoria
+* localidad espacial: significa que si accedo a una posicion de memoria, es probable que acceda a posiciones de memoria cercanas
+
+* estos dos principios que parecen triviales, son muy importantes para el rendimiento de la computadora
+* la cache se aprovecha de estos dos principios
+* llenar la cache en base a estos principios, es lo que hace mas optimo al sistema
+
+* si ir a la cache tardo un ciclo de reloj, y a la memoria principal tardo 10 ciclos de reloj, entonces la cache es 10 veces mas rapida que la memoria principal (ejemplo)
+* por eso ir a la memoria es una penalidad muy grande, tengo que ir lo menos posible
+* al dejar datos en cache, se aprovecha la localidad temporal y espacial
+
+* tambien me puedo traer los datos adjuntos a los datos que necesito, para aprovechar la localidad espacial
+* por eso organizar los datos en memoria es muy importante
+
+* si mi codigo tiene en cuenta estos principios, va a ser mas eficiente, para el uso de cache. Si no los tiene en cuenta, va a ser menos eficiente y esto va a afectar el rendimiento
+
+* me trigo los datos de cache a los registros con la instruccion lw
+* guardo los datos de los registros a cache con la instruccion sw
+
+* los compiladores hacen muchisimas optimizaciones, para que el codigo sea mas eficiente
+
+* se pueden clasificar tambien de internas y externas
+* internas: son las que estan conectadas directamente al CPU, ejemplo la memoria principal
+* externas: son las que estan conectadas al CPU por medio de un bus, ejemplo la memoria secundaria, se conectan a travez de E/S
+
+* capacidad en las memorias externas se expresa en bytes
+* las memorias internas se expresan en bytes o palabras
+* el tamaño de la palabra puede cambiar
+* en MIPS la palabra es de 32 bits, en Intel es de 64 bits
+* en MIPS la palabra es de 4 bytes, en Intel es de 8 bytes
+
+* la memoria externa se tranfiere en bloques de datos, no en palabras
+* la memoria interna se tranfiere en palabras
+* la memoria interna se organiza en palabras pero la unidad direccionable es el byte
+
+* las memorias tambien se carterizan por:
+* metodo de acceso:
+* secuencial: se accede a los datos en orden, ejemplo cinta
+* directo: se accede a los datos en forma directa, ejemplo disco rigido
+* aleatorio: se accede a los datos en forma aleatoria, ejemplo memoria principal y cache.
+* asociativo: se accede a los datos en forma asociativa, ejemplo tablas de etiquetas para cache.
+
+* Prestaciones:
+* tiempo de acceso:
+* variable en secuencial y directo, porque depende de la posicion del dato en secuencial y como se mueve la cabeza lectora en un disco rigido en un metodo directo
+* fijo en las aleatorias, porque no depende de la posicion del dato, sino de la tecnologia de la memoria
+
+* tiempo de ciclo: tiempo entre dos accesos consecutivos, es el tiempo que tarda en estar disponible para un nuevo acceso
+* tiempo de transferencia: tiempo que tarda en transferir un dato
+
+* memorias de acceso aleatorio
+* registros internos, cache(SRAm=M), memoria principal (DRAM), memoria secundaria o ROM (disco rigido, memoria flash)
+
+* DRAM, dinamic RAM, es la memoria principal
+* SRAM, static RAM, es la memoria cache
+
+* la SRAM es un conjunto de flip-flops
+* la DRAM se almacena la informacion en la capacidad parasita de un transistor
+
+* para tener un bit en la SRAM, necesito muchos transistores
+* para tener un bit en la DRAM, necesito un transistor
+
+* la SRAM son mas rapidas pero no tiene capacidad
+* la DRAM son mas lentas pero tiene mas capacidad
+
+* la DRAM necesitan un refresco, el bit esta almacenado con la carga de un capasitor, y con el tiempo se va perdiendo la carga, por eso se necesita un refresco
+* DRAM parte de sus circuitos estan dedicados al refresco, se los consulta y se los va refrescando
+
+* las memorias ROM que son las no volatil
+* ROM significa Read Only Memory, es de solo lectura pero su nombre quedo anecdotico porque puede ser de lectura y escritura
+* pero esta pensada para que no se actualice contantemente
+* un ejemplo de esto es la BIOS
+* se permite un cambio como seria una actualizacion
+
+* la BIOS se accede desde el buteo y sirve para tener un mecanismo de entrada y salida
+
+* mas datos entran en las memorias se hace todo mas complejo
+* con los diagramas de tiempo se puede ver como cada acceso a distintos niveles son cada vez mas complejos
