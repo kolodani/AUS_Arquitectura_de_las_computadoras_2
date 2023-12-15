@@ -1,0 +1,119 @@
+--- REPASO ---
+* la informacion que esta en un nivel i, siempre esta en un nivel i+1
+* la cache es un sustento temporal de los datos
+* siempre respetar los principios de localidad temporal y espacial
+* para aprovechar la cache, voy a traer bloques de memoria, no solo un dato
+* memorias internas estan conectadas a la CPU
+* memorias externas estan conectadas a travez de un bus de E/S
+
+* la memoria cache es la memoria mas rapida, esta al lado de CPU
+* se almacenan cosas que ya estan en memoria principal
+* solo se usa la cache para tener un acceso mas rapido a los datos
+* traemos a la cache un bloque de memoria que es de un tamaño que es una potencia de 2
+* las palabras que puedo traer son las que forman parte del bloque
+
+* funcionamiento, primero consulta si el dato esta en la memoria cache
+* si no esta, lo tiene que ir a buscar en memoria principal y luego lo trae a la cache
+* depende como esta hecha la cache va a almacenar el dato en determinado lugar
+
+* primero como se organiza la cache
+* hay que saber donde esta el dato en la cache
+* cuando hay que llevar los datos de memoria principal a la cache
+* cuando el contenido de la cache se tiene que llevar a memoria principal para actualizarla o liberar espacio
+* tambien hay que entender que valores hay que sacar para hacer lugar para los nuevos datos
+* hay que establecer una politica de reemplazo de datos
+* si reemplazo mal, voy a tener muchos fallos de cache y voy a tener que ir muchas veces a memoria principal
+
+* organizacion de la cache
+* los datos son iguales el contenido de la memoria principal y de la cache
+* el bit de validez indica si el dato esta en la cache o no
+* si el bit no esta activo significa que el dato esta vacio o no es valido
+* la etiqueta sirve para realizar la correspondencia entre la cache y la memoria principal
+* la etiqueta es un identificador que me permite saber donde esta el dato en la memoria principal
+
+* en una cache de mapeo directo, cada dato tiene un unico lugar donde puede estar en la cache
+* si quiero traer un dato de la memoria principal y ya se en que lugar de la cache va a estar por si direccion
+* para que se entienda, si tengo 10 lineas y 1000 datos, el dato 0, 16, 32, 48, 64, van en el mismo lugar en la cache
+* para meter esos datos voy a buscar una funcion de correspondencia que me permita saber donde esta el dato en la cache
+* en este caso uso la funcion modulo
+
+* siempre hay conflicto por querer meter datos en un lugar mas chico
+* la memoria RAM es mucho mas grande que la cache
+* por eso hay que usar bien los espacios de la cache
+
+* el tamaño de palabra de MIPS es de 32 bits o 4 bytes
+* direccionar un byte dentro de una palabra, necesito 2 bits
+* la direccion de cualquier palabra siempre termina en 00
+* osea sus dos bits finales son 00
+* en hexadecimal, son las direcciones que terminan en 0, 4, 8, C
+
+* en este ejemplo la cache tiene 4 palabras por bloque
+* entonces la direccion de la cache tiene:
+* 2 bits de byte para direccionar un byte dentro de una palabra
+* 2 bits de palabra para direccionar una palabra dentro de un bloque
+* 10 bits de indice para seleccionar una fila en la memoria cache
+* 18 bits de etiqueta para identificar el bloque de memoria principal
+
+* el indice al ser 10, es 2^10 = 1024 filas o bloques
+* si el tamaño de la cachhe tiene 16 bloques, es 2^4 = 16
+
+* la cantidad de palabras por bloque tiene que ser una potencia binaria
+* pero los numeros de direccionamiento no tiene que ser potencia de 2
+
+* las etiquetas y los indices pueden no ser potencias binarias o potencias de 2
+* porque no son numeros de direccionamiento como los bits de byte y palabra
+
+* si necesito justo datos que ocupan el mismo lugar en memoria cache, empiezo a tener problemas
+* ese es el problema de correspondencia directa
+* esos dos bloques se iran alternando en la cache
+* el tiempo de acceso se va a ver afectado y parecera que no hay cache
+
+* en cambio esta rigides se pierde en la cache asociativa
+* en este ejemplo, usariamos
+* 2 bits de byte para direccionar un byte dentro de una palabra
+* 2 bits de palabra para direccionar una palabra dentro de un bloque
+* 28 bits de etiqueta para identificar el bloque de memoria principal
+
+* en la cache asociativa, cualquier valor puede estar en cualquier lado
+* pero ahora tengo que revisar en toda la cache para encontrar el dato
+* el dato se almacena en el primer lugar libre
+* ahora puedo guardar los datos mas importantes o mas usados en la cache
+
+* al no tener un indice, no tengo que hacer una funcion de correspondencia
+* no tengo la restriccion de pisar datos pero encontrar un dato es mas lento
+* mas grande es la cache mas lento es el acceso a la cache y la busqueda
+* si el dato esta al final de la cache, tengo que recorrer toda la cache para encontrarlo
+
+* buscando un dato en la cache directa, solo busco en un lugar, mientras que en asociativa busco en todos los lugares
+* la cache asociativa se usa en casos de memorias acotadas
+* las cache asociativas tienen un limite de hardware se vuelve muy complejo
+* las memorias asociativas no escalan bien
+
+* si tuvieras una cache de 16 lineas, las asociativas son mejores
+* pero si tuviera una cache de 1024 lineas, las directas son mejores
+
+* hay un punto que si las cache se hacen mas grandes, no funciona bien, lo mismo si lo hacemos muy chico
+
+* hay una situacion intermedia
+* la cache asociativa por conjuntos o por vias
+* hace una parte por mapeo directo y otra parte por asociativa
+* en este ejemplo,
+* 2 bits de byte para direccionar un byte dentro de una palabra
+* 2 bits de palabra para direccionar una palabra dentro de un bloque
+* 10 bits de indice para seleccionar una fila en la memoria cache
+* 18 bits de etiqueta para identificar el bloque de memoria principal
+
+* en este caso, vemos que es de dos vias
+* hay dos bloques por fila
+
+* el bloque que estoy buscando puede estar en dos lugares
+* primero busco en forma directa, y luego en forma asociativa en las dos vias
+* si no esta en ninguna de las dos vias, tengo que ir a buscarlo a memoria principal
+* ademas tengo el bit de validez que me dice si el dato esta en la cache o no
+
+* mejoramos las prestaciones de memoria directa, al tener dos vias, traigo dos bloques de memoria que ocuparian un lugar en la cache directa
+* con dos vias puedo tener dos bloques de con igual etiqueta en la cache
+
+* importante, las vias no se direccionan, se buscan en paralelo con la etiqueta
+* si tengo dos vias, tengo dos etiquetas
+* si tengo 4 vias, tengo 4 etiquetas
