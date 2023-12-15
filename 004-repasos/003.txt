@@ -1,0 +1,122 @@
+--- REPASO ---
+* cuando hablamos de memoria, hablamos de un conjunto, por eso usamos una jerarquia de memoria
+* principios basicos que se cumplen
+* cualquier dato que hay en cache es una copia de lo que esta en memoria principal
+* en cache siempre se tienen encuenta los principios de localidad temporal y espacial
+* los diagramas temporales nos sirven para ver como se comportan cada jerarquia de la memoria y de alli ver como es el tiempo de acceso a las mismas
+* porque usar una cache
+* porque es para tener una memoria de mas rapido acceso para que el procesador no tenga que esperar tanto tiempo para acceder a la memoria principal
+* si el procesador necesita un dato, lo busca en la cache y lo trae
+* si el dato no esta en la cache, se trae un bloque de memoria que contenga el dato y se guarda en la cache
+* se trae un bloque para aprovechar el principio de localidad espacial
+
+* la organizacion se puede usar tres tipos de cache
+* mapeado directo, completamente asociativo y asociativo por conjuntos
+* mapeado directo, se guarda un dato siempre en la misma posicion en la cache
+* es de facil implementacion, tanto de almacenar como de buscar
+* la completamente asociativa, se puede guardar un dato en cualquier posicion de la cache
+* esto reduce la tasa de fallos, pero buscar un dato es mas engorroso
+* en la asociativa por conjuntos, se divide la cache en conjuntos, y cada conjunto tiene un numero de lineas
+* se aprovecha lo mejor de los dos mundos
+* se busca en filas en forma directa, y cada via se la consulta de forma asociativa
+
+* una palabra en MIPS ocupa 32 bits, y se ve:
+* |01010101|01000001|01011111|10110101|
+* para direccionar dentro de una palabra necesito 2 bits
+* asi me queda:
+* 00 = |01010101|
+* 01 = |01000001|
+* 10 = |01011111|
+* 11 = |10110101|
+
+* la cache de correspondencia directa es mas facil de implementar, pero tiene el problema que la tasa de fallo es mas alta
+* la asociativa mantiene los datos mas usados, pero tengo que comparar todas las etiquetas para saber si estan los datos
+
+* la tasa de fallo se debe a que un dato es buscado en la memoria cache y no estan los datos
+* la tase de fallo se ve reducida si aumento el tamaño del bloque de la cache
+
+* adquisicion de datos
+* en fallo, si no esta el dato en la cache, se trae el bloque de memoria que contiene el dato
+* tambien hay fallos de lectura, cuando se quiere leer un dato y no esta en la cache
+* y fallos de escritura, cuando se quiere escribir un dato y no esta en la cache
+* ademas si altero un valor en cache, tengo que alterar el valor en memoria principal
+* porque voy a tener problemas de consistencia de datos
+
+* tenemos que tener un mecanismo para mantener una coherencia de datos
+* entre los valores de cache y los valores de memoria principal
+* por ejemplo, si altero un valor en la cache, no necesariamente se altera en memoria principal
+* pero si necesito ese lugar en la memoria cache, ahi si actualizo los valores en memoria principal
+
+* no siempre que se actualiza o escribe un valor en cache, necesariamente se cambia en memoria principal
+* es mas se puede cambiar muchas veces el mismo valor en cache y el valor en memoria principal no cambia de como se lo trajo a la cache
+
+* actualizacion de datos
+* tenemos un bit de valides que nos dice que el dato fue modificado
+* si el bit de valides esta en 0, el dato no fue modificado
+
+* reemplazo
+* cada vez que traigo un bloque de memoria principal y no tengo lugar en la memoria cache
+* en memoria directa es mas facil, porque siempre se reemplaza el mismo bloque
+* en memoria asociativa, se reemplaza el bloque que hace mas tiempo que no se usa
+
+* que bloque reemplazo
+* puedo hacerlo al azar
+* puedo hacerlo reemplazando el menos recientemente usado
+* puedo hacerlo reemplazando el menos frecuentemente usado
+* puedo hacerlo con FIFO (no se usa normalmente)
+
+* la memoria cache es multinivel
+* por lo general hay 3 niveles, l1, l2 y l3
+* l1 es la mas rapida y la mas pequeña
+* l2 es mas lenta y mas grande
+* l3 es mas lenta de todas y mas grande de todas
+
+* hay memorias cache que son para datos y otra para el programa
+* hay otras memorias que estan unificadas
+
+* el rendimiento de las cache se mide con la tasa de aciertos
+* la tasa de aciertos es la cantidad de veces que se encuentra un dato en la cache
+* la tasa de aciertos se mide por probabilidad
+* el valor de la tasa de aciertos varia de 0 a 1
+* si el valor esta lo mas cerca de 1, mejor es la cache
+
+* la tasa de fallos hace que el tiempo de penalizacion sea mayor si la tasa es grande
+
+* el rendimiento de la cache
+* tenemos el ciclo de ejecucion mas el ciclo de bloqueo, por el tiempo del ciclo
+* el ciclo de bloque en este caso es el tiempo de penalizacion
+* si tenga una cache es mas grande, puedo bajar el tiempo de penalizacion
+* y si el bloque es mayor, tambien puedo bajar el tiempo de penalizacion
+* no es lo mismo un bloque de una palabra, o de dos palabras, comparado con 4, 8 o 16 palabras por bloque
+* tambien es importante lo amigable del software con el uso de la cache
+* tambien usar eficientemente los registros
+
+* es muy importante estos conceptos para hacer mas eficiente un sistema complejo como este
+* esto se ve cuando se hace un diseño de un procesador
+* se ve cuando se hace un diseño de un sistema operativo
+* se ve cuando se hace un diseño de un compilador
+* se ve cuando se hace un diseño de un lenguaje de programacion
+* se ve cuando se hace un diseño de un sistema de archivos
+* se ve cuando se hace un diseño de un sistema de base de datos
+* siempre hay que hacer un buen uso de los recursos
+* es algo que parece tribial pero son los fundamentos que cuando se cumplen se logran cosas muy buenas
+
+* tranferencias de bloques de memoria principal a memoria cache
+* uno de los escenarios tiene una memoria de un ancho de una palabra
+* el bus es igual de ancho, lo mismo la cache
+* en el caso 2, la memoria es de un ancho de mas de una palabra
+* lo que hace que el bus sea mas ancho y lo mismo la cache
+* pero aqui hay un problema, porque agrego un multiplexor para seleccionar la palabra que quiero
+* es mas rapido pero necesito mas hardware
+* en el caso 3, la memoria tiene mas bancos de memoria, del ancho de una palabra
+* el bus es ancho como una palabra y lo mismo la cache
+* evito el multiplexor
+* cuando el procesador hace una lectura y el dato no esta en cache
+* el direccionamiento se hace en forma simultanea entre los bancos
+* y se tranfieren en orden
+* la implementacion de hardware es mas sencilla
+* la ultima opcion es mas rapida que la primera opcion y menos hardware que la segunda opcion
+
+* dependiendo los casos de uso se elige el hardware mas adecuado
+* lo mismo sucede con el software
+* esto se ve reflejado en el rendimiento y la performance del sistema
