@@ -7,26 +7,38 @@
 a) cache de correspondencia directa:
     direccion de 32 bits, esta compuesta:
         2 bits de byte
-        1 bit de palabra
+        2 bit de palabra
         12 bits de indice
-        17 bits de etiqueta
+        16 bits de etiqueta
+    cantidad de bloques = 4K = 2^12 = 4096
+    tamaño del bloque = 2 palabras = 2 * 4 bytes = 8 bytes
+    tamaño de la cache = 4096 * 8 = 32768 bytes o 32K bytes
 
 b) cache asociativa por conjuntos de 2:
     direccion de 32 bits, esta compuesta:
         2 bits de byte
-        1 bit de palabra
-        12 bits de indice
+        2 bit de palabra
+        11 bits de indice
         17 bits de etiqueta
+    cantidad de bloques = 4K = 2^12 = 4096
+    tamaño del bloque = 2 palabras en dos vias = 2 * 4 bytes * 2 = 16 bytes
+    tamaño de la cache = 4096 * 16 = 65536 bytes o 64K bytes
 
 c) cache asociativa por conjuntos de 4:
     direccion de 32 bits, esta compuesta:
         2 bits de byte
         1 bit de palabra
-        12 bits de indice
-        17 bits de etiqueta
+        10 bits de indice
+        18 bits de etiqueta
+    cantidad de bloques = 4K = 2^12 = 4096
+    tamaño del bloque = 2 palabras en cuatro vias = 2 * 4 bytes * 4 = 32 bytes
+    tamaño de la cache = 4096 * 32 = 131072 bytes o 128K bytes
 
 d) cache completamente asociativa:
     direccion de 32 bits, esta compuesta:
         2 bits de byte
         1 bit de palabra
         27 bits de etiqueta
+    cantidad de bloques = 4K = 2^12 = 4096
+    tamaño del bloque = 2 palabras = 2 * 4 bytes = 8 bytes
+    tamaño de la cache = 4096 * 8 = 32768 bytes o 32K bytes

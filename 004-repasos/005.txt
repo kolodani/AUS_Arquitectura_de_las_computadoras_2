@@ -1,0 +1,255 @@
+--- REPASO ---
+
+* todavia existen procesadores con arquitectura monociclo
+* esta arquitectura es la arquitectura harvard
+* se usa mucho en sistemas embebidos, pequeños o simples
+
+* la idea era reducir costes y reaprovechar unidades
+* teniamos tres sumadores y dos memorias
+
+* cambiamos a la implementacion multiciclo
+* las instrucciones no van a ser constantes
+* incorporaremos mas multiplexores
+* vamos a incorporar registros adicionales
+* de forma tal que cada dato que pasa por cada etapa sea guardado y no se pierda
+
+* ahora tenemos que almacenar registro de instrucciones y registro de datos de memorias
+* tambien almacenamos las dos salidas de los registros antes de entrar a la ALU
+* y tambien almacenamos la salida de la ALU
+* estos registros no son accesibles por el programador, solo estan ahi para que el procesador funcione
+* respetando principios de la arquitectura
+
+* entonces en nuestro nuevo circuito tenemos:
+* un multiplexor a la salida del PC que puede elegir entre la salida del PC o la salida ALU que contiene la direccion efectiva
+
+* vemos que la memoria esta conectada al registro de instrucciones y al registro de datos de memoria
+* a la salida del regidtro de instrucciones tenemos un multiplexor que puede elegir entre rs o immediate para el registro a escribir
+
+* el nuevo multiplexor recibe datos de la ALU o de registro de datos de memoria, para elegir el dato a escribir en el registro
+* si se usa la salida de la ALU, es para el calculo de la direccion efectiva
+* mientras qeu si el multiplexor elige la salida de registro de datos de memoria, es para cargar el dato en el registro
+
+* despues de los registros se guardan las salidas de los registros en dos registros adicionales
+* uno de ellos va a un multiplexor que va a la ALU
+* este multiplexor elegie el dato leido 1 o el PC
+* el otro registro va a un multiplexor tiene 4 opciones
+* 1, es el dato leido 2
+* 2, es el valor 4 para sumar al PC
+* 3, es el immediate extendido a 32 bits
+* 4, es el immediate extendido a 32 bits desplazado 2 bits a la izquierda
+
+* y hay un ultimo multiplexor que recibe el resultado de la ALU, o salida ALU, o salida del registro de instrucciones
+* en esas tres posiciones lo que hace es:
+* 1, el PC + 4
+* 2, el calculo de la direccion efectiva
+* 3, el salto incondicional
+
+* instruccion tipo R
+* paso 1:
+* IR = Memoria[PC]
+* PC = PC + 4
+
+* paso 2:
+* A = Reg[IR[25-21]]
+* B = Reg[IR[20-16]]
+
+* paso 3:
+* ALUOut = A op B
+
+* paso 4:
+* Reg[IR[15-11]] = ALUOut
+
+* instruccion lw
+* paso 1:
+* IR = Memoria[PC]
+* PC = PC + 4
+
+* paso 2:
+* A = Reg[IR[25-21]]
+* B = Reg[IR[20-16]] (no se usa)
+
+* paso 3:
+* ALUOut = A + Signo extendido(IR[15-0])
+
+* paso 4:
+* MDR = Memoria[ALUOut]
+
+* paso 5:
+* Reg[IR[20-16]] = MDR
+
+* instruccion sw
+* paso 1:
+* IR = Memoria[PC]
+* PC = PC + 4
+
+* paso 2:
+* A = Reg[IR[25-21]]
+* B = Reg[IR[20-16]]
+
+* paso 3:
+* ALUOut = A + Signo extendido(IR[15-0])
+
+* paso 4:
+* Memoria[ALUOut] = B
+
+* instruccion beq
+* paso 1:
+* IR = Memoria[PC]
+* PC = PC + 4
+
+* paso 2:
+* A = Reg[IR[25-21]]
+* B = Reg[IR[20-16]]
+* ALUOut = PC + (Signo extendido(IR[15-0]) << 2)
+
+* paso 3:
+* if (A == B) PC = ALUOut
+* else PC (porque ya se incremento en el paso 1)
+
+* instruccion j
+* paso 1:
+* IR = Memoria[PC]
+* PC = PC + 4
+
+* paso 2:
+* PC = PC[31-28] || (IR[25-0] << 2)
+
+* la unidad mas lenta para completar su funcionamiento necesita 2ns
+* por lo tanto el ciclo de reloj durar 2ns
+* por ejemplo, una operacion aritmetica tardara 8ns
+
+* para la realizacion del multiciclo tiene una unidad de control mucho mas grande
+
+* la unidad de control sigue recibiendo los 6 bits de opcode
+* la unidad de control se hace con dos tecnicas, control cableado y control microprogramado
+
+* el control cableado se construlle con una maquina de estados (automata de moore)
+* los dos primeros datos de la maquina de estado finito son siempre iguales
+
+* la maquina de estados tiene distintos estados, todas las instrucciones tiene en comun los dos primeros estados
+
+* estado 0: carga de instruccion
+* estado 1: decodificar instrucciones cargar registros
+
+* detallamos los estados
+* estado 0:
+* leerMem
+* SelALUA = 0
+* SelALUB = 01
+* ALUOp = 00
+* loD = 0
+* EscriR
+* EscrPC
+* FuentePC = 00
+
+* estado 1:
+* SelALUA = 0
+* SelALUB = 11
+* ALUOp = 00
+
+* luedo de estos dos estados, cada instruccion tiene sus propios estados
+* dependiendo de el opcode, se va a un estado u otro
+
+* estado 2: (calculo direccion de memoria)
+* SelALUA = 1
+* SelALUB = 10
+* ALUOp = 00
+
+* estado 3: (acceso a memoria) (solo para lw)
+* leerMem
+* loD = 1
+
+* estado 4: (escritura de registro) (solo para lw)
+* EscriR
+* Mem2Reg = 1
+* RegDest = 0
+(vuelve al estado 0)
+
+* estado 5: (acceso a memoria) (solo para sw)
+* EscrMem
+* loD = 1
+(vuelve al estado 0)
+
+* estado 6: (ejecucion de la operacion) (solo para R)
+* SelALUA = 1
+* SelALUB = 00
+* ALUOp = 10
+
+* estado 7: (escritura de registro) (solo para R)
+* RegDest = 1
+* EscriReg
+* Mem2Reg
+(vuelve al estado 0)
+
+* estado 8: (finalizacion de salto condicional) (solo para beq)
+* SelALUA = 1
+* SelALUB = 00
+* ALUOp = 01
+* EscrPCCond
+* FuentePC = 01
+(vuelve al estado 0)
+
+* estado 9: (calculo de salto incondicional) (solo para j)
+* EscrPCCond
+* FuentePC = 10
+(vuelve al estado 0)
+
+* lw tiene 5 estados
+* sw tiene 4 estados
+* R tiene 4 estados
+* beq tiene 3 estados
+* j tiene 3 estados
+
+* porque tenemos dos tablas de envios
+* porque en los estados tenemos dos bifurcaciones
+* una en el estado 1, que va a los estados 2, 6, 8 y 9
+* y otro en el estado 2, que va a los estados 3 y 5
+* estas tablas son complejas de crear
+
+* como hacemos para procesar excepciones en este procesador?
+* un excepcion es un evento o proceso inesperado que sucede en el procesador
+* por ejemplo, un overflow, instruccion no interpretada
+
+* para las excepciones tenemos un registro de excepciones
+* esto lo hace MIPS
+* en Intel se tiene una tabla de interrupciones y tiene 256 entradas diferentes
+* Intel tiene un integrado externo que maneja las excepciones
+* las interrucciones tiene que ser gestionadas, por eso se tiene una tabla de interrupciones
+* esto en MIPS no sucede
+
+* para porcesar un excepcion en MIPS, guardamos en el registro de excepciones (EPC)
+* que guarda la direccion de la instruccion causante de la excepcion
+* y se guarda en el registro de causa de excepciones (Cause)
+* el sistema puede finalizar o continuar la ejecucion
+
+* siempre saltamos a la direccion 0xC0000000
+* tenemos un registro de 32 bits que es el EPC
+* y otro con la cantidad de causas de excepciones
+
+* el EPC se alimenta de la salida de la ALU que tiene el valor del PC + 4
+* esto crea nuevos estados al automata
+
+(en nuestro ejemplo)
+* estado 10: (desbordamiento) (solo para R)
+* CaudaInt = 0
+* EscrCausa
+* SelALUA = 0
+* SelALUB = 01
+* ALUOp = 01
+* EscrEPC
+* EscrPC
+* FuentePC = 11
+(vuelve al estado 0)
+
+* estado 11: (instruccion no implementada)
+* EscrCausa
+* SelALUA = 0
+* SelALUB = 01
+* ALUOp = 01
+* EscrEPC
+* EscrPC
+* FuentePC = 11
+(vuelve al estado 0)
+
+* ademas se genera una nueva tabla
+* del estado 7 al estado 0, 10
