@@ -1,0 +1,305 @@
+--- REPASO ---
+* toda instruccion tiene que tener su camino de datos correctamente en la unidad de control
+* el camino de datos es por donde se mueve la instruccion
+* la unidad de control control que la instruccion se ejecute correctamente
+
+* el procesador lo que siempre hace es:
+* captar instrucciones
+* intepretar instrucciones
+* captar datos
+* proocesar datos
+* escribir datos
+
+* tenemos los 32 registros de MIPS de 32 bits cada uno
+* se interconctan a la ALU de 32 bits
+* los resultados se vuelve a guardar en los registros
+* no hace operaciones contra la memoria como Intel
+* vamos a necesitar dos registros adicionales que son el PC y el IR
+* el PC es el contador de programa
+* el IR es el registro de instruccion
+* no son accesibles por el programador
+
+* procesador monociclo o uniciclo
+* el PC contiene donde esta apuntando el programa
+* el PC apunta a la memoria de instrucciones
+* memoria de instrucciones es donde esta el codigo del programa
+* memoria de datos es la seccion en la que leemos y escribimos datos
+
+* el procesador va a tener unidades combinacionales y secuenciales
+* define cuando vamos a leer o escribir
+* hablamos de sincronizacion por flancos
+* es quiere decir que cuando estamos en un estado, pasamos al estado siguiente, y asi sucesivamente
+
+* un procesador siempre esta en un ciclo continuo
+* inicia
+* captura de instruccion (ciclo de captacion)
+* ejecucion de la instruccion (ciclo de ejecucion)
+* fin
+* todo hay que hacerlo dentro del procesador
+
+* los primeros dos pasos siempre son identicos
+* el PC se incrementa en 4 apuntando a la siguiente instruccion
+* el IR se carga con la instruccion que esta en la direccion de memoria que apunta el PC
+* cuando termina la ejecucion de la instruccion, se actualiza el PC con la siguiente instruccion y se carga el IR
+
+* el PC apunta a la memoria de instrucciones
+* el mismo PC lo mandamos a una ALU que le suma 4
+* el resultado lo reinyectamos al PC
+
+* las intrucciones tipo R tomares los registros rs, que es el primer operando, y rt, que es el segundo operando
+* tambien tomamos los bits de rd que es el registro destino
+* los registros se conectan a la ALU
+* la ALU hace la operacion y el resultado se guarda en el registro rd
+* la salida de registros siempre tiene dos salidas
+* la ALU puede realizar muchos tipos de operaciones
+* la ALU tiene una entrada de control que le dice que operacion realizar
+
+* el camino de datos de las instrucciones lw y sw es mas complejo
+* la instruccion tiene:
+* 6 bits del opcode
+* 5 bits del rs
+* 5 bits del rt
+* 16 bits de la direccion de memoria
+* en el caso de lw, en el registro que voy a cargar el dato es rt
+* que dato le voy a cargar? el dato que esta en la direccion de memoria que esta en rs + el offset
+* en el caso de sw, en el registro que voy a guardar el dato es rt
+* que dato le voy a guardar? el dato que esta en la direccion de memoria que esta en rs + el offset
+* el offset es un numero de 16 bits que se suma a la direccion de memoria
+* el offset se extiende a 32 bits
+* se usa una direccion base de donde estan los datos y se le suma un valor para moverse en la memoria
+* funciona como un puntero
+
+* de la instruccion sacamos el rs, rt y los 16 bits de immediate
+* si es lw, el rs se conecta a la ALU y el immediate se extiende a 32 bits
+* la ALU suma rs + immediate
+* el resultado se conecta a la memoria de datos
+* la memoria de datos enviara el dato que esta en la direccion que le mandamos a rt
+* el dato se escribira en rt, osea en el banco de registros
+* la palabra fue cargada
+* si es sw, el rs se conecta a la ALU y el immediate se extiende a 32 bits
+* la ALU suma rs + immediate
+* el resultado se conecta a la memoria de datos
+* la memoria de datos guardara el dato que esta en rt en la direccion que le mandamos
+* la palabra fue guardada
+
+* en la instruccion:
+* lw $t0, 8($s0)
+* el $s0 es el registro base (rs)
+* el $t0 es el registro destino (rt)
+* el 8 es el immediate
+* el immediate se extiende a 32 bits
+* la ALU suma $s0 + 8
+* el resultado se conecta a la memoria de datos
+* la memoria de datos enviara el dato que esta en la direccion que le mandamos a $t0
+* el dato se escribira en $t0, osea en el banco de registros
+* la palabra fue cargada
+
+* en la instruccion:
+* sw $t0, 32($s0)
+* el $s0 es el registro base (rs)
+* el $t0 es el registro destino (rt)
+* el 32 es el immediate
+* el immediate se extiende a 32 bits
+* la ALU suma $s0 + 32
+* el resultado se conecta a la memoria de datos
+* la memoria de datos guardara el dato que esta en $t0 en la direccion que le mandamos
+* la palabra fue guardada
+
+* en beq si la condiciones es verdadera, se suma el immediate al PC
+* sino se suma 4 al PC
+* lo mismo sucede con las otras instrucciones de salto condicional
+
+* importante el immediate que se le suma al PC ya contempla el hecho de que el PC se incrementa en 4
+
+* tomamos los bits de rs y rt de la instruccion
+* extendemos el immediate a 32 bits
+* la ALU hace la operacion
+* si la condicion es verdadera, se suma el immediate al PC
+* sino se suma 4 al PC
+* el immediate antes de sumarse al PC se desplaza 2 bits a la izquierda
+* esto es porque el PC se incrementa en 4
+* el dezplazamiento a la izquierda se hace porque al ser palabras de 32 bits, cada palabra termina en 00
+* el resultado de la ALu para ser un si o un no, devuelve una señal llamada zero
+* si zero es 1, la condicion es verdadera, que significa que resto los dos valores
+* si los dos valores son iguales, el resultado es 0
+* si los dos valores son distintos, el resultado es distinto de 0
+* y por lo tanto la condicion es falsa
+
+* como vamos a lograr que todas las señales se activen en el momento correcto?
+* con el uso de multiplexores
+* el multiplexor es una llave que se activa con una señal de control
+* puede tener dos o mas entradas y una salida
+* muchas de estas cosas se utilizan para reutilizar hardware
+
+* ahora agregamos dos multiplexores, uno a la salida del banco de registros en el dato leido 2 y el immediate extendido
+* y el otro multiplexor que toma el dato leido de la salida de memoria de datos y el resultado de la ALU
+
+* ahora con este primer multiplexor la ALU puede estar representando dos cosas
+* puede estar representando la suma de rs + rt o la suma de rs + immediate
+* que serian una intruccion tipo R y una intruccion tipo I
+* dicho de otra forma, la ALU puede estar representando la suma de dos registros o el calculo de la direccion efectiva
+* la operacion R no pasa por la memoria de datos, mientras que la operacion I si pasa por la memoria de datos
+* ambas operaciones se van a guardar en el registro rt
+
+* todo funciona a la vez, lo que sucede es que voy descartando señales por el camino de datos
+* los datos que van quedando y llegan al final del camino son los que se guardan en los registros
+
+* ahora incorporamos todos las piezas nombradas
+* todavia no hemos tomado en cuenta el opcode
+
+* tambien ahora tenoms una nueva ALU para calcular la direccion efectiva
+* de acuerdo con la señal zero y la unidad de control, se decide si se suma el immediate al PC o no
+
+* tenemos ahor aun nuevo multiplexor que toma en las tipo R si usamos rd
+* pero cuando tenemos una instruccion tipo I, el multiplexor toma el rt y no hay rd en la instruccion
+* el multiplexor toma el rt y lo manda al banco de registros
+* ademas los bits del rd estan en la parte immediate de la instruccion
+
+* importante notar que la instruccion lw escribe datos de la memoria en el banco de registros
+* y la instruccion sw escribe datos del banco de registros en la memoria
+
+* en las tipo R, los ultimos 6 bits son el funct, se envian a la unidad de control y esta se conecta a la ALU
+
+* ahora incorporamos la unidad de control, la misma recibe los primeros 6 bits de la instruccion, llamados opcode
+* al mandarle estos valores, la unidad de control sabe que camino tiene que hacer la instruccion
+
+* instruccion tipo R
+* paso 1:
+* el PC apunta a la memoria de instrucciones
+* el mismo PC lo mandamos a una ALU que le suma 4
+* el resultado lo reinyectamos al PC
+
+* paso 2:
+* el opcode se manda a la unidad de control
+* el rs, rt y rd se mandan al banco de registros
+* el rs y rt ahora son los dos datos que se mandan a la ALU
+
+* paso 3:
+* la ALU hace la operacion que le marca el control de la ALU
+
+* paso 4:
+* el resultado de la ALU se manda al multiplexor que lo envia al banco de registros
+* el rd se manda al multiplexor que lo envia al banco de registros
+* asi tengo el registro destino y el dato que se va a guardar en el banco de registros
+* logrando que el resultado de la operacion sea guardado en un registro
+
+* instruccion lw tipo I
+* paso 1:
+* el PC apunta a la memoria de instrucciones
+* el mismo PC lo mandamos a una ALU que le suma 4
+* el resultado lo reinyectamos al PC
+
+* paso 2:
+* el opcode se manda a la unidad de control
+* el rs se manda al banco de registros
+
+* paso 3:
+* el immediate se extiende a 32 bits
+* la ALU suma rs + immediate
+* esta suma calcula la direccion efectiva
+
+* paso 4:
+* la direccion efectiva se manda a la memoria de datos
+* el dato esta disponible en la salida de la memoria de datos
+
+* paso 5:
+* y el dato se manda al multiplexor que lo envia al banco de registros
+* el rt se manda al multiplexor que lo envia al banco de registros para que sea el registro destino
+* asi tengo el registro destino y el dato que se va a guardar en el banco de registros
+* logrando que la palabra sea cargada
+
+* instruccion sw tipo I
+* paso 1:
+* el PC apunta a la memoria de instrucciones
+* el mismo PC lo mandamos a una ALU que le suma 4
+* el resultado lo reinyectamos al PC
+
+* paso 2:
+* el opcode se manda a la unidad de control
+* el rs se manda al banco de registros
+* el rt tambien se manda al banco de registros
+
+* paso 3:
+* el dato leido 1 que es rs se manda a la ALU
+* el immediate se extiende a 32 bits
+* la ALU suma rs + immediate
+* esta suma calcula la direccion efectiva
+
+* paso 4:
+* la direccion efectiva se manda a la memoria de datos
+* el dato leido 2 que es rt se manda a la memoria de datos
+* el dato leido 2 se guarda en la direccion efectiva
+* logrando que la palabra sea guardada
+
+* instruccion beq tipo I
+* paso 1:
+* el PC apunta a la memoria de instrucciones
+* el mismo PC lo mandamos a una ALU que le suma 4
+* el resultado lo reinyectamos al PC
+
+* paso 2:
+* el opcode se manda a la unidad de control
+* el rs y rt se mandan al banco de registros
+
+* paso 3:
+* calculamos en la ALU rs - rt
+* esto nos va a decir si los dos valores son iguales o no
+* si son iguales, el resultado es 0 (señal zero)
+* si son distintos, el resultado es distinto de 0
+* por el otro lado, el immediate se extiende a 32 bits
+* el immediate se desplaza 2 bits a la izquierda
+* el PC se suma con el immediate
+
+* paso 4:
+* ahora dependiendo del resultado de la ALU, se suma el immediate al PC o no
+* si la condicion es verdadera, se suma el immediate al PC
+* sino se deja al PC como estaba (que ya apuntaba a la siguiente instruccion)
+
+* instruccion j tipo J
+* paso 1:
+* el opcode se manda a la unidad de control
+* los 26 bits de la direccion de memoria se mandan a la ALU
+* extendemos a 28 bits la direccion de memoria
+* tomamos del PC + 4 los primeros 4 bits
+* y los concatenamos con los 26 bits de la direccion de memoria
+* esto nos da la direccion de memoria a la que tenemos que saltar
+
+* tenemos ahora la tabla de la unidad de control
+* tenemos los opcodes que son las entradas de la unidad de control
+* y tenemos las salidas que son las señales de control
+* cada una va hacia un multiplexor o una ALU o una memoria
+
+* el control de la ALU es tiene mas datos que los otros controles
+* esto es porque la ALU tiene muchas operaciones
+
+* la memoria de instrucciones se relee cada vez que cambia el PC
+
+* el ciclo de reloj esta definido por la instruccion mas lenta
+* en este ejemplo
+* el acceso a memoria es de 2ns
+* ALU y sumadores es de 2 ns
+* acceso a registros es de 1 ns
+
+* en estos ejemplos que vimos el peor caso es lw, que es de 8 ns
+* 2 ns de memoria de instrucciones
+* 1 ns de acceso a registros
+* 2 ns de ALU
+* 2 ns de acceso a memoria de datos
+* 1 ns de acceso a registros
+* total 8 ns
+
+* con esto decimos que el reloj del procesador uniciclo tiene un tamaño de 8 ns
+* que es el de tamaño de la instruccion mas larga
+
+* ahora hacemos una evaluacion de rendimiento por el porcentaje de tiempo que se usa cada componente
+* el tiempo de ejecucion del monociclo es siempre de 8 ns
+* pero en este ejemplo el procesador que queremos hacer tiene un tiempo de ejecucion de 6.3 ns
+* el rendimiento relativo es de 8/6.3 = 1.27
+* este precesador seria multiciclo
+
+* se podria hacer una reduccion de costos reutilizando hardware
+* plantea primero qeu reutilizar la ALU y no tener tres de ellas
+* no tener el acceso a memoria separado
+* esto nos va a dar un nuevo modelo, una nueva estructura de procesador
+* el procesador multiciclo
+
