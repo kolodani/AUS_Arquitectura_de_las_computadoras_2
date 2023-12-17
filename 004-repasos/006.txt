@@ -1,0 +1,115 @@
+--- REPASO ---
+
+* en una computadora no tenemos una unica memoria, sino que tenemos un conjunto de varias memorias, cada una con su funcion especifica
+* vimos primero la cache, sirve para mejorar el rendimiento
+* es para mejorar el acceso a los datos, para que sea mas eficiente
+
+* como hago hago uso de la memoria secundaria
+* para esto aparece el concepto de memoria virtual
+
+* usa memoria virtual cuando el espacio de direccinoes fisicas de la memoria principal se agota
+* volvemos al concepto de bloques, aca se llaman paginas
+* la idea es tener en memoria principal las paginas que se estan usando
+* y las que no se estan usando, se guardan en memoria secundaria (disco rigido)
+
+* para esto el sistema operativo tiene una fuerte participacion
+* en el ejemplo de linux, el sistema operativo tiene un archivo que se llama swap
+* en windows se llama pagefile.sys
+* el sistema de linux es mas flexible, porque permite tener varios archivos de swap
+
+* hoy por hoy la memoria ram es mas barata, pero estos conceptos siguen siendo validos
+* la memoria virtual es un concepto que sigue vigente
+
+* gracias al concepto de memoria virtual vamos a ver que, hay una seguridad de los procesos, vamos a ver que el espacio de direcciones de cada proceso es independiente
+* porque porque no es una direccion fisica, sino virtual
+* y el sistema operativo se encarga de traducir las direcciones virtuales a direcciones fisicas
+
+* esta traduccion se puede hacer de muchas formas
+* cuando el procesador hace referencia a una direccion virtual, pasa por un traductor, que hace la traduccion a una direccion fisica
+* la traduccion de marco de un memoria virtual a una fisica
+
+* podemos plantear que cada pagina tiene un tamaño de 4kb
+* lo que tendremos es un numero de pagina que corresponda a un numero de marco
+
+* algunas posiciones no se pueden traduccir porque apuntan al disco rigido y no a memoria
+* cuando se hace la traduccion y no esta en memoria fisica y si en el disco rigido, genera una excepcion
+* el sistema operativo se encarga de traer esa pagina de memoria secundaria a memoria principal
+
+* aca tambien se tienen en cuenta los mismos principios que vimos en cache
+* debemos tener en cuenta que paginas se estan usando y cuales no
+* y mantener las mas usadas en memoria principal
+* tambien siempre buscamos en memoria principal, y si no esta, se busca en memoria secundaria
+
+* la performance de la memoria virtual depende de la politica de reemplazo de paginas
+* ya que la penalizacion de ir a memoria secundaria
+* si hago bien las cosas, el software trabaja bien
+* hacemos que el fallo de pagina sea el minimo
+* si tenemos muchos procesos se puede ver como el disco rigido esta trabajando aunque no hagamos nada
+* esto sucede porque esta haciendo el intercambio de paginas
+
+* usando el ejemplo de MIPS, mis direcciones son de 32 bits
+* lo mismo mis direcciones virtuales
+
+* divido la direccion virtual en dos partes
+* numero de paginas y desplazamiento
+* lo mismo para la direccion fisica
+* numero de marco y desplazamiento
+* los desplazamiento son iguales
+* lo que va a cambiar es el numero de pagina y el numero de marco
+
+* en general, el numero de pagina es mas grande que el numero de marco
+* en la traduccion, el mismo numero de desplazamiento se mantiene
+* lo que se ve en forma contigua en memoria virtual no necesariamente se ve en memoria fisica
+
+* en nuestro ejemplo 4 Gb de memoria virtual y 1 Gb de memoria fisica
+* tenemos 12 bits para el desplazamiento
+* 20 bits para el numero de pagina
+* 18 bits para el numero de marco
+
+* aca aparece el concepto de tabla de paginas
+* me permite convertir una direccion virtual a una direccion fisica
+
+* ejemplo, quiero traducir la pagina "4" de memoria virtual a memoria fisica
+* el sistema operativo tiene una tabla de paginas
+* en la tabla de paginas, tengo una entrada por cada pagina
+* en la entrada tengo el numero de pagina y el numero de marco
+* por ejemplo, en el lugar 4 de la tabla de paginas, tengo el numero de pagina 4 y el numero de marco 7 (por ejemplo)
+* entonces, uso el numero 7 de marco mas el desplazamiento para acceder a la direccion fisica
+
+* ademas la tabla cuenta con un bit de validez
+* este bit me dice si la pagina esta en memoria principal o no
+* si esta en memoria principal, el bit de validez esta en 1
+* si esta en memoria secundaria, el bit de validez esta en 0
+
+* cuando quiero traducir, y el bit de validez esta en 0, se genera una excepcion
+* el sistema operativo se encarga de traer la pagina de memoria secundaria a memoria principal
+* esto no altera el valor de pagina para la direccion virtual
+* pero si altera el valor de marco para la direccion fisica
+
+* hay dos tipos de excepciones que se pueden generar
+* que la pagina no se encuentre en memoria principal
+* o que la pagina no se encuentre en memoria secundaria (segmenation fault)
+
+* existen tablas de paginas para cada proceso
+* estas paginas tambien ocupa espacio en memoria principal
+* tambien se necesita primero hacer una traduccion para acceder a la memoria
+
+* tengo la ventaja de mas capacidad, pero tengo mayor tiempo de acceso
+
+* para el tema del tamaño de paginas, se pueden poner limites
+* no necesitamos tener todos los numeros de paginas en la tabla de paginas
+* podemos usar hashing para reducir el tamaño de la tabla de paginas
+
+* tambien envian las tablas de paginas a memoria secundaria, de los procesos que no se estan usando
+
+* el tiempo de acceso se reduce con la implementacion de una memoria cache
+* esta cache especial guarda las traducciones mas recientes
+* se llama TLB (translation lookaside buffer)
+
+* si la traduccion no esta en la TLB, se busca en la tabla de paginas
+* si no esta en la tabla de paginas, se genera una excepcion
+* el sistema operativo se encarga de traer la pagina de memoria secundaria a memoria principal
+* y actualiza la TLB
+
+* el impacto en el rendimiento es muy alto al usar memoria virtual, pero es necesario para poder ejecutar varios procesos a la vez
+
