@@ -1,0 +1,121 @@
+--- REPASO ---
+
+* cuando hablamos con el controlador de entrada salida, estamos leyendo o escribiendo una serie de registros
+* estos registros pueden ser de control, datos o de estado
+* a partir de esto el controlador de entrada salida se encarga de realizar las acciones correspondientes
+
+* en MIPS usamos lw y sw para leer datos y escribirlos, no nos interesa si es en memoria o en un dispositivo de entrada salida
+* por eso se dice que mapeamos los dispositivos de entrada salida como si fueran memoria
+
+* los fabricantes se encargan de que su pefiferico se pueda mapear con un software que ellos mismos proveen
+* que se puede adaptar al sistema operativo que se este usando
+* los sistemas operativos vienen con muchos drivers pre instalados que hacen que la tarea sea transparente de parte del usuario
+
+* las abstracciones se logran despues de haber agregado ciertas abstracciones y ciertas rutinas adicionales al sistema operativo
+
+* tipos de las interconexiones de buses
+* los buses porcesador-memoria
+* al tener un gran intercambio de informacion, por eso son muy de corta longitud, de diseño especifico, propietarios, bajando la latencia ademas de evitar problemas de electromagnetismo
+* los buses de backplane
+* son buses de longitud media, de diseño estandar, variedad de dispositivos
+* los buses de E/S
+* son buses de larga longitud, de diseño estandar, variedad de dispositivos, pero su velocidad es menor
+
+* estas diferencias marcan los distintos tipos de buses que existen y para que seran implementados
+* tambien con esto se ve la diferencia de la evolucion de los buses
+
+* tema un poco mas dejado de lado es la sincronizacion de los buses
+* aquellos buses que tienen un reloj, nos ayudan ya que tienen una referencia comun para manejar las lecturas y escrituras
+* pero en los buses asincronicos, no tengo esa referencia, por lo que voy a necesitar un protocolo que nos diga cuando nos diga cuando comienza y termina
+* la ventaja es que se puede conectar a dispositivos mas lentos, o tambien a dispositivos mas rapidos
+
+* la mayoria de los buses internos son sincronicos, para mantener una coherencia mas sencilla
+
+* otra cuestion sobre los buses es el anchos de banda
+* la frecuencia de reloj si es aumentada, aumento el ancho de banda, pero esto tiene ciertos limites
+* si tenemos separados el bus de datos y direcciones podemos aumentar el ancho de banda
+* la tranferencia por bloques para optimizar los recursos, tal y como lo hacemos en memoria cache
+* en este caso, traigo un bloque lo mas grande posible, sin embargo, esto tiene un costo, si el bloque es mas grande, la latencia es mayor
+
+* ahora como acceso al bus, ya que todos los sistemas quiere acceder al bus
+* en el caso que hay un unico maestro, que es el procesador, el es el que decide quien accede al bus
+* la cuestion cambia si hay mas de un maestro, si hay mas de un procesador, o si hay un control de DMA
+* a eso se lo llama mecanismo de arbitraje, hay arbitraje centralizado y distribuido
+
+* el centralizado dice quien va accediendo al bus, y el distribuido, se llega a la decicion a travez de un proceso
+* si estan conectados en serie, esto favorece al dispositivo mas prioritario
+* sin embargo si estan conectados en paralelo, va a poder tomar deciciones mas complejas, pero va a tomar mejores deciciones para administrar a los actores
+
+* tambien los arbitrajes descentralizados pueden ser distribuido por autoseleccion, o por detecccion de colisiones
+* en el caso de autoseleccion, cada dispositivo tiene un numero de prioridad, y el que tenga mayor prioridad va a poder acceder al bus
+* en el caso de deteccion de colisiones, se detecta si hay mas de un dispositivo que quiere acceder al bus, y se toma una decicion en base a eso
+
+* entrada salida programada
+* el CPU le pregunta al modulo de entrada salida, por ejemplo, si quiero escribirlos
+* verifica si el dispositivo esta listo, si no lo esta, lo que hace es esperar y volver a preguntar devuelta si esta listo
+* en el bucle no se ve si son 1, 2, 3, o miles de veces.
+* lo que implica que el procesador no puede hacer otra tarea
+* el hecho de hacer que el microprocesador haga esta consultas, no lo hace muy optimo
+* esto es todo por software
+* es simple, para dispositivos chicos y se malgasta mucho el tiempo del procesador
+* pero para que nos seria util?
+* esto se puede implementar con cuestiones basicas
+* por ejemplo en una notebook y una computadora de un lavarropas, en el caso del lavarropa el procesador esta malgastado pero no tiene nada que hacer.
+* en el caso de la notebook, el procesador esta malgastado, pero tiene que hacer otras cosas
+
+* entrada salida interrupciones
+* en este caso, solicita una operacion a un dispositivo de entrada salida
+* y se pone a hacer otra cosa, y cuando el dispositivo esta listo, el dispositivo le avisa al procesador que esta listo
+* aca el procesador no hace el bucle de chequeos
+* se vuelve solamente cuando hay interrupciones
+* en la interrupcion se ve si tambien hay un problema
+* este esquema es una gran ventaja al anterior
+* voy a aprovechar el recurso CPU
+* pero se agrega una complejidad importante
+* el procesador tiene que tener un mecanismo para decidir si atender la interrupcion o no
+* porque tal vez es mas importante lo que esta haciendo que atender la interrupcion
+* necesito informacion adicional, como interrupciones vectorizadas y registro de causa
+* ademas cuando decido atender a una interrupcion, y tengo que analizar cual es el problema, puede aparecer otra interrupcion
+* si una interrupcion es muy delicada, puedo hacer que hasta que no se termine de solucionar dicho problema no se atienda otra interrupcion
+* por ejemplo si quiero escribir en el disco, y recibo una interrupcion, tengo una lista de prioriedades dependiendo la interrupcion
+* voy a tener que cambiar el contexto, se guarda el estado de todo el procesador, para poder volver a ese punto
+* realizar las tareas para atender la interrupcion, y luego volver al estado anterior como si no hubiera pasado nada
+* al implementar interrupcion, liberamos al procesador de estar haciendo consultas
+* es muy util para dispositivos de ancho de banda bajo y asincronos
+* yo voy a tener la interrupcion cuando la necesite
+* es mas costoso por hardware, y puede que sea un poco mas lenta, pero en teoria gano porque uso el procesador de forma mas eficiente
+
+* excepciones - MIPS
+* las excepciones son cualquier ecento inesperado que puede cambiar el flujo del programa
+* mientras que las interrupciones son un caso particulas de excepciones que provienen del exterior del procesador
+
+* en MIPS tnemos numero de registro de excepciones
+* es necesario para saber en que lugar guardo el proceso para poder volver
+* puedo tener interrupciones anidadas, antendiendo a la mas importante primero
+* si implemento esto, recordar de guardar el estado del proceso en la pila
+
+* en la señál se ven los bits del registro de causa y el registro de estado
+* el registro de estado me diga si esta habilitadas las interrupciones o no
+* las almacenara en vez de responderla
+* hay una serie de bits que me permite enmascarar las interrupciones para desabitilar algunas
+
+* muchas veces notamos las distancias que hay entre el usuario y el hardware
+
+* DMA
+* ahora agregamos al controlador de DMA
+* se encarga de las transferencias de datos entre memoria y dispositivos de entrada salida
+* y el procesador se desentendera de esto diciendole al DMA como hacer las transferencias
+* ahora la operacion con DMA
+* el procesador lo programa y espera la respuesta del DMA
+* para que esto funcione, se necesiten interrupciones
+* el DMA pasa a ser un nuevo maestro del bus
+* hay que usar un mecanismo de arbitraje
+* tambien esto presenta un problema con memoria virtual
+* si el DMA es inteligente hace el mapeo de memoria virtual a memoria fisica
+* esto requiere mayor complejidades
+* el DMA quiere mover dos paginas, le paso la direccion fisica de la pagina, y el DMA se encarga de hacer el mapeo
+* ahora hay que tener mayor coherencia con la memoria cache
+* si la cache tiene un dato nuevo o actualizado, pero si ahora hay un DMA y quiere leer en memoria un dato desactualizado
+* libera al procesador de las transferencias
+* es util para dispositivos de ancho de banda alto como el disco rigido
+* es mas costoso por hardware y complejo
