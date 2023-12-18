@@ -1,0 +1,138 @@
+--- REPASO ---
+
+* una cuestion que siempre tuvimos en cuenta en todos los temas de memoria y CPU fue el rendimiento
+* en el caso de entrada salida, el rendimiento es un tema muy importante
+* latencia, ancho de banda, tiempo de respuesta, productividad(throughput)
+
+* la latencia se mide en tiempo
+* el ancho de banda se mide en bytes por segundo, kilobytes por segundo, megabytes por segundo, etc
+
+* ejemplo, si quiero ir de rosario a buenos aires, si voy a una velocidad de 100km/h, voy a tardar 4 horas
+* ahi la latencia seria 4 horas
+* si voy en auto y soy una sola persona, la tasa de transferencia seria 1 persona cada 4 horas
+* si vamos 4 en un auto, la tasa de transferencia seria 4 personas cada 4 horas
+* si vamos 40 en un micro, la tasa de transferencia seria 40 personas cada 4 horas
+* la latencia es la misma, pero la tasa de transferencia es diferente
+
+* ahora si voy a 200km/h, voy a tardar 2 horas, bajando la latencia
+* tambien aumenta el ancho de banda, porque la tasa de transferencia es mayor
+
+* dependiendo el sistema, necesitamos una latencia muy buena o un ancho de banda muy bueno
+
+* si quiero comunicarme a estados unidos, la latencia es muy importante, porque la distancia es muy grande
+* porque yo como usuario quiero un tiempo de respuesta muy rapido, quiero que la latencia sea muy baja
+* se nota un mal rendimiento si la latencia es muy alta
+* en este caso el ancho de banda es minimo
+* la latencia depende de la conectividad, si es cableada
+
+* si quiero transferir un archivo de 500mb, el ancho de banda es muy importante
+* porque es el parametro que me va a limitar, porque si tengo un ancho de banda muy bajo, voy a tardar mucho tiempo en transferir el archivo
+
+* depende el contexto, van a ser los parametros que marquen el rendimiento
+
+* el rendimiento no es la unica problematica que enfrentamos en el caso de entrada salida
+
+* la confiabilidad, porque se ve esto en los dispositivos de almacenamiento
+* porque, porque si un dispositivo de almacenamiento se corrompe, se pierde la informacion
+* segun el contexto puede ser muy grave
+* opcion 1, sistema rapido, pero poco confiable
+* opcion 2, sistema lento, pero muy confiable
+
+* si tengo un disco rigido con una probabilidad de falla del 20%
+* y otro disco rigido con una probabilidad de falla del 1%
+* me inclino por el segundo, aunque sea mas lento
+* porque puede ser que pierda informacion irrecuperable
+* o informacion que puedo recuperar a un alto costo de tiempo y trabajo
+
+* las unidades de almacenamiento siempre son un punto critico
+
+* latencia, es algo de mas bajo nivel, mientras que tiempo de respuesta es algo de mas alto nivel
+* latencia, es ir de un punto a otro, mientras que tiempo de respuesta es el tiempo que tarda en responder una operacion
+* un tiempo de respues, ocupa varios tiempos de latencia
+
+* tambien tenemos nuevas escalas para medir confiabilidad, fiabilidad, disponibilidad
+* estas escalas tambien nos van a ayudar a tomar una decicion sobre que dispositivos usar
+
+* ahora bien, en el esquema de interconexion
+* el sistema que manejabamos antes tenia, procesador, cache y memoria
+* pero como fue cargado un programa cargado en la memoria, donde guardo los resultados
+* ahora contamos con discos rigidos, discos de estado solido, placa de video, la red, etc
+* solo el procesador y la cache se comunican directamente
+* pero el resto de los dispositivos se comunican a traves del bus de memoria E/S
+* la memoria principal esta conectada al bus de memoria E/S
+* los demas tienen un controlador de E/S para comunicarse con el bus de memoria E/S
+
+* son sistemas muy diversos, el hardware es completamente diferente
+* sumado a la diversidad, tenemos que tener encuenta las caracteristicas de ancho de banda, latencia
+
+* todo dispositivo de E/S que tiene interaccion directa con el humano, no tiene gran ancho de banda, salvo el monitor.
+* el teclado, el mouse, el joystick, el microfono, parlantes, etc
+
+* vamos a tener que acomodarnos a todas las distintas necesidades, y que el procesador puede utilizar todo el hardware que lo rodea y que su rendimiento no caiga
+
+* el procesador tiene una conexion casi directa con la memoria principal
+* pasa por la cache, y el bus de memoria E/S
+* la conexion con un disco rigido no es directa, aparece el controlador de E/S
+* el controlador de E/S va a ser de traductor entre el procesador y el disco rigido
+
+* el procesador enviara alguna ordern para leer un sector del disco rigido, y el controlador de E/S se encargara de traducir esa orden a una orden que el disco rigido entienda
+* el controlador de E/S nos dara un grado de abstracion, porque no nos tenemos que preocupar por como se comunica el procesador con el disco rigido
+
+* el controlador sirve de enlace E/S, controlador y temporizador, comunicacion con CPU, comunicacion con el dispositivo, buffering, correccion de errores
+
+* al haber diferencias de velocidades entre el procesador y el dispositivo, se utiliza un buffer
+* muchas operaciones de entrada salida, se va almacenando informacion en el buffer de entrada salida y se va procesando al ritmo que lo permita el disco rigido
+* si quiero almacenar en un disco rigido, mando una orden al controlador de entrada salida, y el controlador tiene un buffer interno y va almacenando la informacion en el buffer
+* a medida que puede hacer uso del disco rigido, ya que este necesita mas tiempo para procesar la informacion
+* por eso la necesidad del buffer, lo mismo sucede cuando necesito leer informacion de un disco rigido
+
+* tratamos de llevar la mayor cantidad de complejidades al controlador de E/S, para que el procesador no tenga que preocuparse por eso
+* en el caso de MIPS podemos acceder a memoria y a disco con lw y sw
+* como hicimos en el caso de acceso a memoria, elegiremos un controlador de E/S para cada dispositivo
+* el espacio de direcciones fisicos de memoria, va a estar una parte en memoria fisica resul
+* y otra parte en memoria de E/S
+
+* la memoria fisica deja de ser algo totalmente plano
+* y pasa a ser un mapa de memoria, donde tenemos distintas zonas, esta sectorizada
+* una zona para la memoria principal, otra para la memoria de E/S, otra para la memoria de video, etc
+
+* dividimos los controladores de E/S en funciones de control, estado, datos
+* podemos tener un registro de control que nos va a permitir leer o escribir
+* avisarnos si el dispositivo esta listo
+
+* por ejemplo, para escribir un sector del disco rigido, el contenido que yo queria almacenar esta en una derminada posicion de memoria fisica (0x1000)
+* a partir de esa posicion, 512 bytes deberian ser copiados
+* lo que tengo que hacer por un lado es copiarlos al registro de datos
+* si suponemos que la transferencia es del tamaño de una palabra, en nuestro caso 4 bytes
+* entonces tengo que copiar 128 palabras, 512 bytes
+* estas transferencia se hacen haciendo lw, para leer de memoria y sw para escribir en un lugar que apunta al registro de datos
+* una vez que hice la misma
+* luego le digo al controlador de E/S que quiero escribir en un sector particular del disco rigido
+* y se me data una serie de registros de control para saber que la operacion fue bien hecha
+* para saber si todo salio bien, podria leer algun bit de estado y ver que la transferencia se completo
+
+* cuando se habla de hacer un acceso al disco rigido, se hace una serie de muchos procesos que el procesador no tiene que preocuparse
+* que si lo hiciera el procesador, seria muy lento
+* la computadora tiene que ser capaz de hacer muchas cosas a la vez
+* sin comprometer el rendimiento
+
+* como sabe el procesador donde tiene que guardar los datos, como sabe el estado de la operacion de transferencia
+* para saber esto necesitamos informacion
+* el responsable de hacer todas estas interacciones es el sistema operativo
+* para garantizar ciertas premisas
+
+* para acceder a distintos dispositivos, el sistema operativo tiene que tener informacion de como poder utilizar el hardware que dispone y como mapearlos
+* cuando yo instalo un hardware nuevo, instalo un dispositivo de entrada salida nuevo, un controlador de entrada salida, un driver (que es un controlador por software)
+* el sistema operativo es el que va a hacer la escritura al disco
+* si quiero escribir en disco, en verdad lo que estamos haciendo es una llamada al sistema
+
+* al introducir un nuevo dispositivo, agragamos hardware, y capas de software para poder utilizarlo
+* cada controlador de hardware, tiene su driver, por mas que tenga dos discos rigidos, cada uno tiene su driver
+* lo que hace el driver es extender o implementar alguna de las funciones que tiene que hacer el sistema operativo en algun hardware en particular
+
+* si tengo un micro controlador muy sencillo, no hay sistema operativo, hay un programa muy sencillo
+* tengo que ser conciente de que si quiero escribir en un dispositivo de entrada salida, tengo que tener en cuenta donde apunto y que hago
+
+* los buses nos permiten conectar distintos dispositivos efiicientemente
+* es versatil y de bajo costo
+* pero impone limites y puede ser un cuello de botella
