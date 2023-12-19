@@ -1,0 +1,86 @@
+--- REPASO ---
+
+* si no puedo comunicarme con el mundo exterior poco sentido tiene no poder comunicarme con el mundo exterior
+* si se rompe un procesador, voy y lo cambio
+* si se rompe un disco, voy y lo cambio pero puedo haber perdido datos importantes o irrecuperables
+
+* vimos dispositivos de poco ancho de banda y de mucho ancho de banda
+* poco ancho de banda: teclado, mouse, impresora
+* mucho ancho de banda: disco, memoria, placas de video
+
+* aparecia la necesidad de comunicarse con otros dispositivos sin complejizar el procesador
+* aparece el concepto de controlador de dispositivos
+* y tambien aparecen los buses de datos
+
+* cada bus tiene caracteristicas propias, dependiendo al dispositivo que se conecte
+* en MIPS usamos lw y sw de la misma forma de siempre, pero en realidad estamos usando el bus de datos
+
+* cuando tengo mas de un procesador, tengo que tener un concepto de arbitraje
+
+* E/S programada: el procesador interroga al dispositivo, el procesador es muy poco eficiente
+* E/S por interrupcion: el dispositivo interrumpe al procesador, el procesador es mas eficiente, no hace consultas innecesarias
+* el controlador me va a avisar cuando hay cambios en el dispositivos
+* DMA, es un nuevo controlador, lo que hace es reemplezar al procesador en la transferencia de datos, el procesador le dice al controlador que transfiera datos y el controlador se encarga de hacerlo, el procesador puede hacer otra cosa mientras tanto
+
+* DMA significa Direct Memory Access, o acceso directo a memoria
+* el procesador se desliga de hacer consultas constantemente al dispositivo, el controlador se encarga de hacerlo
+* tambien se ahorra el tiempo de transferencia de datos
+
+* si tenemos una interrupcion con un ancho de banda minimo me conviene usar interrupcion porque la sobrecarga de generar una transferencia por DMA no vale la pena, por ejemplo mover una palabra
+* si tengo que acceder al disco o la placa de red me conviene usar DMA porque el ancho de banda es muy grande
+
+* discos rigidos
+* es un plato o varios, que giran en forma solidaria y hay un cabezal que se mueve de forma mecanica
+* los platos estan dispuestos en forma de cilindro
+* a la hora de hacer lecturas o escrituras lo tengo que llevar a la posicion correcta
+* las revoluciones por minuto son importantes, cuanto mas revoluciones mas rapido es el acceso a los datos
+* tambien el tiempo que tarda en llevar los datos del disco a la controladora del disco
+* y la sobrecarga de datos del disco al controlador
+
+* memorias flash
+* memorias flash, pendrives, discos de estado solido
+* tienen un tiempo de vida util, tienen un limite de escrituras
+
+* RAID
+* Redundant Array of Independent Disks
+* es agregar redundancia a los discos
+* se genera un disco virtual a partir de varios discos fisicos
+
+* RAID 0
+* tengo dos discos fisicos y genero un disco virtual
+* tengo dos discos de 1TB y genero un disco virtual de 2TB
+* puedo hacer escritura y lecturas paralelas
+* la desventaja que si se me rompe un disco pierdo todos los datos
+
+* RAID 1
+* tengo dos discos fisicos y genero un disco virtual
+* tengo dos discos de 1TB y genero un disco virtual de 1TB
+* puedo hacer escritura y lecturas paralelas
+* la ventaja es que si se me rompe un disco no pierdo los datos
+
+* RAID 5
+* tengo 5 discos fisicos y genero un disco virtual
+* tengo 5 discos de 1TB y genero un disco virtual de 4TB
+* tengo un disco de paridad, que es un disco que tiene la paridad de los otros discos
+* si se me rompe un disco puedo recuperar los datos a partir de la paridad
+* la desventaja es que tengo que tener un disco de paridad
+* requiere una controladora especial
+
+* RAID 6
+* lo mismo que RAID 5 pero tengo dos discos de paridad
+
+* RAID 10
+* es un RAID 1 de RAID 0
+* tengo dos RAID 0 y genero un RAID 1
+
+* servidores
+* uso para datacenters
+* tipicamente no va a haber, teclado, mouse, monitor
+* para hacer mantenimiento en un rack, hay una sola estacion con teclado, mouse y monitor y se conecta a todos los racks
+* los servidores soportan muchos discos, muchos procesadores, mucha memoria
+
+* hay servidores que solo son de almacenamiento
+* tiene capacidad de administracion, identificacion, gestion remota, reinicio, capacidad de autodiagnostico
+
+* los errores desde el punto de vista logico son muy destructivos
+* hacen que se complique demasido la recuperacion de datos
