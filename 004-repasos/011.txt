@@ -1,0 +1,53 @@
+--- REPASO ---
+
+* porque usar GPU en lugar de CPU
+* limites para seguir aumentando la frecuencia de reloj
+* limitas para hacer transistores mas pequeños
+* restricciones de energia y calor
+* limites al paralelismo, pipelines mas largos terminan teniendo menor rendimiento
+* limite a manycore, no se pueden poner tantos cores a una sola pastilla
+
+* las GPUs
+* poseen un pipeline grafico
+* utilizan unidades aritmeticas programables (shaders)
+* fueron pensadas desde el inicio SIMD
+* SIMD: single instruction multiple data
+* soportan muchos flujos de ejecucion(threads o hilos)
+* SIMT: single instruction multiple threads
+* pueden generalizar los shaders
+* tienen una jerarquia de memoria compleja
+* aprovechan al maximo el principio de localidad
+* gran velocidad de acceso a la memoria (DDR5)
+
+* Limitaciones de la GPU
+* no puede acceder directamente a la memoria del procesador
+* se requiere hacer copias explicitas de los datos entre CPU y GPU
+* no se puede hacer uso en el codigo de sali estantdar (printf)
+* la depuracion es compleja y ardua
+
+* Aplicaciondes de la GPU
+* GPGPU: usar la GPU para aplicaciones de proposito general
+* las aplicaciones que mejor se adaptan:
+* las que trabajan con grandes vectores de datos
+* las que tiene paralelimo de grano fino SIMD
+* Dominios adecuados de aplicaciones
+* algebra lineal, procesamiento de señales, mecanica computacional, inteligencia artificial
+
+* Desafios para programar GPU
+* la programacion CPU y GPU no son compatibles
+* todo dato a procesar debe convertirse en texturas para aprovechar el procesamiento por shaders
+* se usa la teecnica render to texture para escribir ya que no se puede acceder trivialmente a la memoria
+* el calculo se realiza mediante flujo de procesador de fragmentos
+* Se hacen necesarios estandares como OpenCL y CUDA
+
+* modelos de programacion GPGPU
+* OpenCL: es un modelo open source para programacion grafica
+* Direct3D: es otro modelo de programacion grafica
+* CUDA: Compute Unified Device Architecture, es un modelo propietario para programacion general de las GPUs de NVIDIA
+* OpenCL: es un modelo open source multiplataforma para programacion paralela, subconjunto de C99
+
+* terminologia CUDA
+* kernel: funciones especiales en ANSI C. usan palabras claves e=para poder tratar con el paralelismo
+* threads: o flujo, son la unidad de ejecucion basica de un kernel
+* grids: grupos de ejecucion de threas pertenecientes a un kernel
+* blocks: subconjunto de ejecucion de threads dentro de un grid
