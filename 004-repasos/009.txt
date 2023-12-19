@@ -1,0 +1,192 @@
+--- REPASO ---
+
+* ya mejoramos uniciclo con multiciclo
+* ahora queremos encontrar una forma de mejorar multiciclo
+* ya identificamos que esta dividido en etapas, ahora queremos que los procesos sean concurrentes
+
+* vamos a ver como mejoramos las etapas y mejoramos la productividad
+* reduciendo los tiempos de ejecucion
+* aprovechar que cada recurso sea liberado, para que otro proceso lo use
+
+* en un ejemplo tenemos un lavadero
+* tenemos 3 etapas, lavado, secado y planchado
+* lavado tarda 30 minutos, secado 40 minutos, planchado 20 minutos
+* si lo hacemos cuatro veces, tardamos 6 horas, 1,5 horas por proceso
+* si hacemos segmentacion, cuando se me libera la lavadora, puedo poner mas ropa a lavar
+* luego tengo que se termine la secadora, que pase al panchado y vuelvo a usar la secadora que se liberado
+* el tiempo nos lleva 3,5 horas, cada tarea sigue siendo 1,5 horas
+
+* nosotros tenemos que secuencial el tiempo seria, el tiempo de cada tarea sumada por cada proceso
+* pero si hacemos segmentacion tenemos n procesos, pero empieza cada proceso cuando termina la primer tarea
+
+* llegamos a una idea que si el tiempo segmentado seria el tiempo total por la carga de trabajo, esto no es cierto, porque todas las etapas de segmentacion duran el mismo tiempo
+
+* mas alla de eso la segmentacion es mas eficiente que la secuencial
+* no mejora la latencia de un proceso, pero si hay varios procesos, mejora la productividad
+* la segmentacion esta limitada por la etapa mas lenta
+
+* en teoria una segmentacion perfecto termina de ejecutar un instruccion por ciclo
+* la segmentacion es mas evidente los tres procesos
+* obtener instruccion, decodificar instruccion, ejecutar instruccion
+
+* en el MIPS hay 5 etapas de segmentacion
+* IF, ID, EX, MEM, WB
+* IF es la etapa de obtener instruccion (IMem)
+* ID es la etapa de decodificar instruccion (Reg)
+* EX es la etapa de ejecutar instruccion (ALU)
+* MEM es la etapa de acceder a memoria (DMem)
+* WB es la etapa de escribir en registro (Reg)
+
+* en secuencial las 5 etapas duran 8 ns
+* en segmentacion las 5 etapas duran 8,5
+
+* pero secuencial tres instrucciones duran 24 ns
+* en segmentacion tres instrucciones duran 12,5 ns
+
+* segmentacion viene de pipeline
+
+* vamos a ver que pueden aparecer problemas cuando se mezclan las instrucciones
+* si dos instrucciones usan el mismo recurso en el mismo ciclo, se produce un conflicto
+* no se puede hacer escritura en un mismo banco de registro por ejemplo
+
+* cada unidad funcional puede usarse solo una vez por instruccion
+
+* una solucion para esto es un stall y la otra hacer un retraso de una instruccion
+* podemos usar un pipeline bubble, lo que introduce una burbuja que atrasa a todas las siguientes instrucciones una etapa
+* otra forma es retrasar agregando un ciclo de reloj, haciendo a todas las instrucciones del mismo tamaño, es agregar una instruccion que no hace nada
+* esto se llama NOP, no operation, es muy facil de implementar
+
+* en el uniciclo teniamos un enorme ciclo de reloj, lo que hacia que las intrucciones mas cortas al final no tienen uso
+* en el multiciclo teniamos un ciclo de reloj por etapa, lo que si la instruccion termina, enseguida comienza la siguientes
+* en la segmentacion tenemos un ciclo de reloj por etapa, pero sn el siguiente ciclo de reloj, la siguiente instruccion comienza
+
+* uniciclo se usa en algunos casos porque es muy sencillo
+* multiciclo es mas complejo, pero cayo en desuso
+* segmentacion es mas complejo, pero es el que se usa hoy en dia
+
+* en este circuito segmentado, la memoria de instrucciones y la memoria de datos estan separadas
+* existen cache de instrucciones y cache de datos
+* esto complica el diseño del controlador de cache
+
+* en IF esta el PC, la ALU mas 4, la memoria de instrucciones
+* en ID esta el banco de registros, aca esta la extension de signo
+* en EX esta la ALU que calcula la direccion efectiva, la ALU que calcula la operacion
+* en MEM esta la memoria de datos
+* en WB esta el banco de registros anterior porque escribe para atras
+
+* un diseño con 5 etapas implica si o si en aislar las etapas
+* para guardar los datos de una etapa a otra, se usan registros intersegmentos
+* se llaman IF/ID, ID/EX, EX/MEM, MEM/WB
+
+* cuando estamos en lw
+* en la etapa IF
+* se hace el PC mas 4, se guarda en IF/ID la intruccion y el PC mas 4
+
+* en la etapa ID
+* se lee el banco de registros, se hace la extension de signo, se guarda en ID/EX el PC mas 4, el rs, el rt, el signo extendido
+
+* en la etapa EX
+* se calcula la direccion efectiva, se hace el calculo en la ALU, se guarda en EX/MEM la salida de la ALU, el rt, el signo extendido
+
+* en la etapa MEM
+* se accede a memoria, se guarda en MEM/WB la salida de la memoria, el rt, el signo extendido
+
+* en la etapa WB
+* se escribe en el banco de registros, se guarda en el banco de registros el rt, la salida de la memoria (pero el numero de registro puede estar errado)
+
+* en este caso tengo que hacer una correccion, extraigo los bits y los voy corriendo, para asegurarme que el numero de registro sea el correcto
+
+* se añade una señal de control, que lo extrae en la segunda etapa, y tiene tres registros EX, MEM, WB
+
+* los bits de control se van a alojar con los registros intersecmentos
+* todas las instrucciones tardan los mismos ciclos
+* no se usa una maquina de estado finito, sino tablas de verdad
+
+* las causas que pueden reducir el rendimiento
+* riesgos estructurales, riesgos de dependencia de datos, riesgos de control
+
+* riesgos estructurales: se intenta usar el mismo recurso al mismo tiempo
+* se soluciona con hardware
+
+* riesgos de depencencia de datos: se intenta usar un recurso que todavia no esta disponible
+* se soluciona con la forma con que programamos
+
+* riesgos de control: se intenta tomar una decision antes de evaluarse la condicion
+
+* todos estos riesgos se pueden solucionar, si, una de las soluciones mas facil seria esperar
+* las instrucciones que precesen a la causante continuan
+* mientras que la instruccion que causa el riesgo y las siguientes se detienen
+
+* se puede hacer un stall, que es un retraso de una instruccion
+* se puede hacer un reordenamiento de instrucciones, que es un reordenamiento de las instrucciones
+
+* riesgo estructurales, acceso simultaneo a memoria
+* solucion intruduccion de un stall
+
+* riesgos por dependencia de datos
+* en sus sistemas segmentado se presentan 2 intrucciones i y j, con i ejecutandose antes que j
+* en MIPS solo hay riegos RAW
+* quiero hacer una lectura inmediatamente despues de una escritura
+* no voy a tener el tiempo suficiente para hacer la actualizacion
+* no todas las dependencias de datos contiene riesgos
+
+* riesgo de datos WAR
+* intento leer un dato y este es modificado antes de que se complete la lectura
+* porque hay instrucciones que no trabajan en orden (out of order)
+* esto no sucede en MIPS (in order)
+
+* riesgo de datos WAW
+* intento escribir un dato antes que otro lo haga
+* esto no sucede en MIPS (in order)
+
+* vamos a ver los problemas de dependencia de datos de RAW
+* si la escritura se hace antes de la lectura, hay un riesgo menos
+
+* tambien hay que tener en cuenta si estas instrucciones estan en un bucle
+
+* una solucion es hacer forwarding
+* que es adelantar el resultado de una etapa a la siguiente
+* el valor no lo tengo en el banco de registros, pero el valor ya esta actualizado despues del calculo de la ALU
+
+* vamos a agregar modificaciones al datapath
+* agregando multiplexores mas complejos que reciben informacion de otras etapas
+* vamos a necesitar comparadores para hacer la deteccion
+
+* inclusive hagamos adelantamientos, hay riesgos todavia
+* ingresamos en esos casos, una burbuja, que es un retraso de una instruccion
+* los riesgos pueden ser detectados por hardware o por el compilador
+* la instruccion se llama NOP, no operation, no hace nada
+* la solucion de software es mas eficiente, porque por hardware se necesita muchisimo hardware
+
+* ahora para poder controlar estos adelantamientos, necesitamos una unidad de forwarding, una unidad de deteccion de riesgos
+
+* se debe detectar un riesgo y luego se adelanta un valor
+* si el rd de la instruccion anterior es igual al rs o rt de la instruccion siguiente
+* tanto si rd este en EX/MEM o MEM/WB y rs o rt este en ID/EX
+
+* muchos de estos riesgos se solucionan con el compilador
+* el compilador puede reordenar las instrucciones
+* el reordenamiento de instrucciones puede ayudar a eliminar burbujas y ayuda al forwarding
+
+* los riesgos de control se dan en las instrucciones de salto
+* en el caso es adelantar la resolucion de la condicion ya que necesito saber si la condicion es verdadera o falsa
+* si la condicion es verdadera, se hace un flushing, que es un vaciado de las instrucciones que no se van a ejecutar
+
+* lo que hace el flushing es cambiar la instruccion que se convierta en un NOP
+* se agrega un comparador a la salia de los registros, si son iguales, le dice que tienen que saltar y hacer un flushing, generando un NOP
+* si la condicion es falsa, se sigue ejecutando normalmente
+
+* tambien se puede cambiar de orden a las instrucciones que siempre se hagan pase o no la condicion
+* esto se llama predicciones de salto
+* con estoo se puede evitar el flushing
+
+* el salto retardado tiene varias estrategias
+
+* la prediccion estatica, se eliminan los resultados especulativos
+* la prediccion efectiva y la prediccion no efectiva
+* con esto se necesita hacer predicciones y ver si me quedo en un estado o en otro
+* la prediccion de de un bit tiene dos estados, dos bits tiene cuatro estados
+
+* que pasa con las excepciones, como afecta a la segmentacion
+* basicamente hay que detectarla y vaciar el pipeline
+* se trata con el sistema operativo
