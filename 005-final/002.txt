@@ -268,11 +268,11 @@ con los permisos necesarios
 de escritura al controlador de E/S correspondiente
 4) El controlador de e/s obtiene los datos del proceso y los almacena
 temporalmente en su bufer interno
-5) El controlador de e/s transfiere los datos desde su bufer interno aldispositivo de
+5) El controlador de e/s transfiere los datos desde su bufer interno al dispositivo de
 E/S real
 6) Cuando se ha finalizadola transferencia de datos el controlador emite una
 interrupcion para notificar al so que la escritura ha finalizado
-7) El so devuelve el control al programa de usuario que solicitolaescritura
+7) El so devuelve el control al programa de usuario que solicito la escritura
 
 
 -- Que complejidades introduce DMA
@@ -281,11 +281,11 @@ interrupcion para notificar al so que la escritura ha finalizado
 memoria simultaneamente por lo que es necesario un mecanismo de coordinacion
 para evitar colisiones y errores
 Asignacion de recursos: el sistema debe asignar los recursos adecuadamente para
-evitar problemas de aaceso a la memoria
+evitar problemas de acceso a la memoria
 Seguridad: El DMA puede plantear problemas de seguridad cuando un dispositivo
 periferico se ve comprometido ya que puede acceder a la memoria sin autorizacion
 Depuracion y diagnostico: el uso de dma puede complicar en la identificacion de
-losproblemas y erroresdel sistemaporlo que es necesario herramientas y tecnicas de
+los problemas y errores del sistema por lo que es necesario herramientas y tecnicas de
 depuracion adecuadas
 
 
@@ -295,39 +295,151 @@ RAW soluble por forward
 * add $t0, $s0, $s1
 add $t1, $t0, $s2
 La segunda instruccion intenta acceder alcontenido de t0 que todavia no fue escrito
-por laprimera instruccion entonces se produce un riesgo raw
+por la primera instruccion entonces se produce un riesgo raw
 para resolverlo se puede aplicar tecnicas de forwarding para enviar el resultado de
-la primera instruccion tantoa la etapa de ejecucion como a la etapa de regristro
-Esto permite que la seg instrucc pueda acceder al resultado antes de que se escriba
+la primera instruccion tanto a la etapa de ejecucion como a la etapa de regristro
+Esto permite que la seg instruccion pueda acceder al resultado antes de que se escriba
 en el registro
 
 
 -- En que categoría de Flynn ubicaría a CUDA. Justifique
 
 * modelo simd(una instruccion, multiples datos) todas las unidades ejecutan la
-misma instruccion sincronizadamente pero condistintos datos. Es un computador
-que explotavarios flujos de datos dentro de un unico flujo de intrucciones para
+misma instruccion sincronizadamente pero con distintos datos. Es un computador
+que explota varios flujos de datos dentro de un unico flujo de intrucciones para
 realizar operaciones que pueden ser paralelizadas de manera natural.
-Cuda pertenece almodelo SIMD por lo tanto esta diseñado paraexplotar el
+Cuda pertenece almodelo SIMD por lo tanto esta diseñado para explotar el
 paralelismo a nivel de datos, esto quiere decir que un conj de operaciones
 aritmeticas pueden ser ejecutadas sobre un conj de datos de manera simultanea
 Cuda ademas consiste en 1 o mas faces que se pueden ejecutar o bien en el
 procesador principal o en la GPU
-Las fases enlas que hay poco paralelismo se implementan en el codigo que se
+Las fases en las que hay poco paralelismo se implementan en el codigo que se
 ejecuta en CPU y las fases donde hay un nivel elevado de paralelismo se
 implementan enel codigo que se ejecuta en la GPU
 
 
 -- Enumere y explique la necesidad de los metadatos en la memoria cache
 
-* Es la informacion adicional que se guarda juntos conlos datos enla cache. Esta info
-adicionar incluye informacion como la ubicacion del dato enmemoria, el tam del
+* Es la informacion adicional que se guarda juntos con los datos en la cache. Esta info
+adicional incluye informacion como la ubicacion del dato en memoria, el tamaño del
 bloque, la ultima vez que se accedio al bloque.
-Son utiles para que la cache funcione de manera eficienteporejemplo cuando se
-busca un dato enla cache los metadatos se utilizar para saber si el dato se
-encuentra en la cache y si es asi donde se encuentra, en caso de que noseencuentre
+Son utiles para que la cache funcione de manera eficiente por ejemplo cuando se
+busca un dato en la cache los metadatos se utilizar para saber si el dato se
+encuentra en la cache y si es asi donde se encuentra, en caso de que no se encuentre
 los metadatos se utilizan para saber cual de los bloques de MP tiene que ser traido
 a la cache
-Los metadatos tambien se utilizan para llevar un registro de la cant de espacio que
+Los metadatos tambien se utilizan para llevar un registro de la cantidad de espacio que
 esta siendo utilizado en memoria y para determinar que bloque reemplazar en caso
 de necesitar espacio para uno nuevo.
+
+
+
+-- Explique como opera específicamente el siguiente kernel CUDA haciendo énfasis en los datos.
+__global__ matrix_add_gpu (fload *A, float *B, float *C, int N) {
+int i = blockIdx.x * blockDim.x + threadIdx.x;
+int j = blockIdx.y * blockDim.y + threadIdx.y;
+int index = i + j*N;
+if (i<N && j<N) {
+C[index] = A[index] + B[index];
+}
+}
+
+*Este kernel CUDA es un ejemplo de una operacion de suma de matrices en paralelo
+1. indices de Hilo y Bloque: Cada hilo de ejecución se identifica con dos indices:
+"blockIdx.x * blockDim.x + threadIdx.x" para la dimensión X y
+"blockIdx.y * blockDim.y + threadIdx.y" para la dimension Y. Estos indices se utilizan para
+calcular la posicion en la matriz resultante C
+2. Calculo del indice en la Matriz: La posicion (index) en la matriz C se calcula a partir de los indices del hilo.
+Dado que se trabaja con matrices
+bidimensionales, el indice se calcula utilizando la formula "i + j * N".
+3. Verificacion de Limites: Antes de realizar la operacion de suma, se verifica que los indices "i" y "j" estén dentro
+de los límites de la matriz (menores que "N"). Esto evita que los hilos intenten acceder a ubicaciones de memoria fuera
+de los limites de las matrices.
+4. Operacion de Suma de Matrices: Si los indices estan dentro de los limites, se realiza la operación de suma de
+matrices. La posición
+"C[index[" en la matriz resultante se actualiza sumando los elementos correspondientes de las matrices de entrada
+"A" y "B".
+En terminos de paralelismo, cada hilo de ejecucion en el bloque CUDA realiza una operacion de suma de matrices
+independiente en paralelo.
+los bloques de hilos pueden ejecutarse en paralelo en la GPU
+
+
+
+-- El siguiente es un ejemplo de comunicación punto a punto del tipo bloqueante entre dos procesos P0 y P1. Explique
+con detalle donde se bloquea y porque (utilice los números de línea para referirse al código aclarando si habla de P0 o
+de P1).
+
+1
+ #include "mpi.h"
+2
+3
+ int rank, nproc;
+4
+5
+ int main( int argc, char* argv[] ) {
+6
+ int isbuf, irbuf;
+7
+ MPI_Status status;
+8
+9 MPI_Init( &argc, &argv );
+10 MPI_Comm_size( MPI_COMM_WORLD, &nproc );
+11 MPI_Comm_rank( MPI_COMM_WORLD, &rank );
+12
+13 if(rank == 0) {
+14 isbuf = 9;
+15 MPI_Send( &isbuf, 1, MPI_INTEGER, 1, 1, MPI_COMM_WORLD);
+16 } else if(rank == 1) {
+17 MPI_Recv( &irbuf, 1, MPI_INTEGER, 0, 1, MPI_COMM_WORLD,
+18 &status);
+19 printf( " %d\n", irbuf );
+20 }
+21 MPI_Finalize();
+22 }
+
+* En este codigo MPI, se realiza una comunicacion punto a punto entre dos procesos, P0 y P1.
+P0 (Proceso 0):
+Línea 14: P0 inicializa "isbuf" con el valor 9. se utiliza "MPI_Send" para enviar "isbuf" al proceso 1 ("rank == 1").
+en este punto, P0 se bloquea
+en la llamada a "MPI_Send" hasta que el proceso 1 haya realizado una correspondiente operacion de recepcion
+("MPI_Recv").
+P1 (Proceso 1):
+Línea 17: P1 utiliza "MPI_Recv" para recibir datos de P0. La llamada espera hasta que los datos esten disponibles. P1
+se bloquea en esta línea
+hasta que P0 haya enviado los datos utilizando "MPI_Send".
+Línea 19 Una vez que los datos han sido recibidos, P1 imprime el valor de "irbuf" en la consola. Después de imprimir,
+P1 continua con la
+ejecucion y llega a la línea 21.
+la operacion de envío ("MPI_Send") realizada por P0 en la línea 15 bloquea a P0 hasta que el proceso 1 complete la
+operacion de recepcion
+("MPI_Recv") en la linea 17.
+la operacion de recepción ("MPI_Recv") realizada por P1 en la linea 17 bloquea a P1 hasta que P0 complete la operacion
+de envio
+("MPI_Send") en la linea 15.
+
+
+-- Enumere y explique la necesidad de los metadatos que se encuentran en la tabla de paginas.
+* La tabla de paginas en un sistema de gestion de memoria virtual juega un papel crucial al mapear las direcciones
+virtuales a direcciones iísicas.
+los metadatos asociados a la tabla de paginas son necesarios para gestionar eficientemente la memoria virtual.
+1.Marco de Página Asociado: asocia cada entrada en la tabla de paginas con un marco de pagina especifico en la memoria
+fisica, permite la traduccion de direcciones virtuales a direcciones fisicas al indicar donde reside cada pagina en la
+memoria fisica.
+2. Bit de Presente/Ausente: indica si una pagina esta presente en la memoria fisica o si ha sido movida a la memoria
+secundariay ayuda a gestionar eficientemente la paginacion y determina si se necesita realizar una operacion de
+intercambio desde el almacenamiento secundario.
+3.Bits de Protección (read/write/execute): define los permisos de acceso a una pagina, como lectura, escritura o
+ejecucion. controla y protege el acceso a las paginas, asegurando que las operaciones se realicen segun las politicas
+de proteccion establecidas.
+4.Bits de Modificado y Accedido: registra si una pagina ha sido modificada o accedida recientemente. facilita el
+mantenimiento de politicas de reemplazo de paginas eficientes, como el algoritmo de reemplazo LRU (Least Recently Used)
+o la escritura diferida.
+5.Bits de Compartido o Privado: indica si una pagina es compartida entre procesos o es exclusiva de un proceso. permite
+la implementacion de la memoria compartida, donde varias instancias de un proceso pueden acceder a la misma pagina
+fisica.
+6. Bits de Cache Disable/Enable: controla si una pagina debe almacenarse o no en la memoria cacha .permite optimizar el
+rendimiento al determinar que paginas deben almacenarse directamente en la memoria cache o cuales pueden mantenerse en
+la memoria principal.
+7.Bits de Tamaño de pagina: define el tamaño de cada pagina en la memoria virtual. facilita la gestion eficiente de la
+memoria al ajustar el tamaño de las paginas segun los requisitos del sistema y las caracteristicas de las aplicaciones.
+
