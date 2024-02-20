@@ -1,0 +1,333 @@
+-- Explique en que casos un bucle puede o no paralelizarse y por que?
+
+* La paralelizacion consiste en transformar un programa secuencial en una nueva version concurrente semanticamente
+equivalente. Entonces, a nivel de bucles se ejecutan varias iteraciones o sentencias del bucle en paralelo.
+Hay tecnicas como la distribucion de bucle o intercambio de bucles en donde es necesario una paralelizacion de estos,
+ya que, por un lado pretendemos distribuir sentencias de un bucle en bloques de sentencias donde podamos aplicar alguna
+tecnica de paralelizacion, por el otro lado tenemos que se busca cambiar el orden en que los bucles son ejecutados con
+la finalidad de aumentar la eficiencia del proceso de paralizacion.
+Para finalizar podemos decir que un caso donde no conviene paralelizar un bucle es cuando abusamos de la paralelizacion
+en estos bucles. Un caso puntual son los bucles anidados, ya que si se ejecutan muchos subprocesos enlazados a calculos
+en un unico proceso no se gana velocidad sino mas bien sobrecarga.
+
+
+
+--
+
+* lw $R1, 100($R0)
+add $R2, $R1, $R3
+add $R4, $R3, $R0
+sw $R4, 200($R0)
+(Es probable que se de un riesgo de datos ya que la instruccion “add” intenta sumar
+$R1 + $R3 antes de que la instruccion “lw” llegue a cargar el valor de la direccion en el registro $R1;
+y por otro lado hay otro riesgo de datos porque la instruccion “sw” intentara guardar el valor de $R4 en la direccion a calcular antes de que la intruccion “add” haya podido actualizar el resultado de su suma.)
+
+La solucion definitiva es cambiar el orden de las instrucciones “add”, de esta manera no cambiamos el funcionamiento del codigo y podemos solucionar utilizando rescheduling sin stalls.
+
+Lw $R1, 100($R0)
+Add $R4, $R3, $R0
+Add $R2, $R1, $R3
+Sw $R4, 200($R0)
+
+
+
+-- compare MPI vs OpenMP y cite algun caso de uso en que usted eligiria una u otra y el porque?
+
+* Destacar que MPI como tambien OpenMP son modelos de programacion paralela.
+
+MPI es un modelo estandar para memoria distribuida. Incluye mecanismos para comunicarse entre procesos con mensajes
+punto a punto pero tambien para comunicaciones colectivas. Podemos decir que fue creado para mensajes de clusters, MPP,
+y para algunas maquina de memoria compartida. Ademas, el programador es el principal encargado de paralelizar el
+programa mediante funciones.
+Las comunicaciones punto a punto mas usadas son: de tipo blocking y de tipo non-blocking.
+Por mi parte yo elegiria utilizar MPI en entornos de estructura SPMD ya que todos los hilos y procesos se ejecutan en
+el mismo programa pero sobre diferentes datos y esto es acorde a MPI ya que trabaja con un solo programa y multiples
+datos; tiene que haber una necesidad de flujo de datos que modele ese paso de mensajes.
+
+Por otro lado tenemos OpenMP que consiste en una extension API de C, C++ y Fortran para escribir programas para memoria
+compartida. Aqui todos los hilos comparten la memoria, por ende no es necesaria la comunicacion entre procesos, OpenMP
+ayuda a paralelizar un programa por medio de directivas; muchas de estas son variables que se establecen en tiempo de
+compilacion.
+En este caso yo elegiria utilizar OpenMP en entornos de estructura Loop Parallelism o Fork/Join. Ya que, en general, el
+programa utilizara un hilo en secciones secuenciales y varios hilos en secciones paralelas. En la otra estructura se da
+el caso de que en OpenMP hay un subproceso que se ejecuta desde el principio hasta el final y se llama “master thread”.
+Ademas, las secciones paralelas hacen que se bifurquen estos hilos a “forks”, estos se denominan “slave threads”.
+
+
+
+- ¿Como se evita un tamaño excesivo de la tabla de paginas?
+
+* La tabla de pagina consume un monton de espacio memoria, ahora cuales son las alternativas que tenemos para afrontar
+este problema de tamaño excesivo?
+Hay varios, por un lado podriamos decir que quizas no tengamos que usar todo el universo de paginas disponibles,
+solamente tengo que usar un conjunto, podria usar algun mecanismo para limtar el tamaño de paginas, lo que sucede es
+que debido a como esta estructurado el software , el sistema operativo, tipicamente no se usan todas posiciones
+contiguas, hay segmento de codigos que esta en distintas posiciones, entonces como que la tabla de paginas van quedando
+como huecos, por eso es necesario buscar una alternativa mas eficiente.
+
+Una alternativa es PAGINAR LA TABLA DE PAGINAS, es decir que la tabla de paginas sea justamente algo susceptible A SER
+PAGINADO, es decir a que sea enviado a memoria secundaria cuando no se usa, si ese proceso no está en uso entonces su
+tabla de pagina tampoco va a estar en uso y por lo tanto puede estar en memoria secundaria. Ahora bien, si ese proceso
+está en uso, ese proceso va a tener que hacer referencia a una memoria y voy a necesitar que es tabla de pagina esté en
+memoria.
+
+En resumen la tabla de paginas ocupa un lugar, ese lugar va a estar en memoria principal (si lo uso) y hay distinas
+técnicas para tratar de reducir ese consumo de memoria y para mitigar ese efecto, entonces tipicamente el anidamiento
+de tabla de paginas, la paginacion de tabla de paginas, funciones de hashing para ubicar la tabla de paginas, etc.
+Aunque tipicamente la alternativa de usar una tabla de paginas multinivel y hacer uso de la paginacion de la tabla de
+paginas son de las mas populares.
+
+
+
+-- ¿Que necesita para que un procesador segmentado pueda resolver riesgos de datos?
+
+* Para que un procesador segmentado pueda resolver riesgos de datos se debe tener en cuenta los siguientes puntos:
+Cuando se detecta un riesgo se puede solucionar, la solucion mas simple es parar la segmentacion hasta que el riesgo se
+vaya. Ademas, se necesita que el control de la segmentacion sea capaz de detectar las causas y decidir acciones.
+Entonces... Los riesgos por dependecia de datos pueden presentarse varios escenarios pero supongamos que se presentan 2
+instrucciones i y j donde i se ejecuta antes que j.
+El unico riesgo que se presenta en MIPS es RAW (read after write): aqui sucede que la instruccion j intenta leer una
+fuente de informacion antes de que la instruccion i la haya modificado. Ejemplo:
+ADD r1, r2, r3
+SUB r5, r1, r6
+...
+
+Para solucionar este riesgo RAW se puede tomar el “Adelantar” o “Forward” que consiste en adelantar el resultado de una
+etapa a la siguiente, osea lograr que la lectura y la escritura se lleven en flancos diferentes de reloj. Por ejemplo:
+la escritura en el flanco ascendente y la lectura en el flanco descendente.
+
+Existen otros dos riesgos que se dan en otros procesadores como WAR (write after read) y WAW (write after write). En
+estos procesadores se da una tecnica que se llama “Out of order”, es por ello que estos dos riesgos se pueden dar.
+WAR es cuando j intenta modificar un destino antes de que i haya leido la fuente.
+WAW se da cuando j intenta modificar un destino antes de que i lo haya hecho.
+
+
+
+-- ¿ En que caso es mas conveniente utilizar DMA?
+
+* El controlador DMA realiza transferencias entre el dispositivo de E/S y la memoria sin intervencion del procesador.
+De esta manera el procesador no realiza esta transferencia y evitamos problemas de ancho de banda como cuando tenemos
+un dispositivo como un disco rigido.
+
+Continuando con la respuesta podemos agregar conceptos como memoria virtual y la memoria cache en el controlador pero
+concluyendo con la idea principal este controlador es util en dispositivos de entrada y salida de mucho ancho de banda,
+donde el tiempo que justamente se emplea en la transferencia es importante como por ejemplo: Disco rigido, tarjetas de
+sonido, graficas, etc.
+Por ultimo podemos decir que si utilizamos este controlador en dispositivos E/S de poco ancho de banda, como un mouse,
+esto podria ser contraproducente porque el costo que tendria para programar este controlador es mucho mayor que si el
+procesador directamente lea el registro de datos del controlador de E/S del mouse.
+
+
+
+-- En que categoria de Flynn ubicaria a CUDA. Justifique.
+
+* CUDA es un modelo propietario para programacion general de las GPUs de NVIDIA. Entonces en la categoria de Flynn
+nosotros ubicariamos a CUDA en el modelo SIMD; obteniendo un flujo de instrucciones de 1 a muchos de flujo de datos.
+Esto es asi ya que esta pensando para explotar el paralelismo a nivel de datos, osea un conjunto de operaciones
+aritemeticas se pueden ejecutar sobre un conjunto de datos de manera simultanea.
+Ademas, en resumen, un programa en CUDA consiste en una o mas fases que pueden ser ejecutadas o bien el procesador
+principal o en la GPU.
+Las fases en las que hay poco paralelismo a nivel de datos se implementan en el codigo que se ejecuta en el CPU y las
+fases con un nivel de paralelismo a nivel de datos elevado se implementa en el codigo que se ejecutara en la GPU.
+
+
+
+-- Enumere y explique la necesidad de los metadatos en la memoria cache.
+
+* Los metadatos en la memoria cache son necesarios ya que, nosotros dentro de la memoria cache tendremos los datos (lo
+que esta en la memoria principal estara en la cache: datos) y aparte de eso tendremos los metadatos y uno de estos es
+muy importante ya que es la etiqueta que nos permitira diferenciar los bloques (osea, como saber si en la linea 0 esta
+el bloque 0 o el bloque 8)
+Tambien existe otro metadato importante que es el bit de validez, que nos va a decir si la linea tiene datos validos o
+no, porque puede ser basura. Esté bit nos dira si la cache esta vacia o no.
+Otro metadato es el bit dirty, el cual nos dice si una linea fue alterada y todavia no fue replicada en memoria
+principal.
+
+
+
+-- Tiene dos cluster compuestos por 16 nodos. Cada nodo tiene dos procesadores Intel Xeon de 32 cores cada uno y una
+GPU Nvidia con 4096 cores CUDA.
+Se le asigna la tarea de diseñar una arquitectura de software adecuada para dicha máquina.
+Describa que modelo de programación concurrente utilizaría que explote la arquitectura al máximo según las condiciones
+del código a programar
+(ayuda: debe combinar varios modelos).
+
+* Para aprovechar al máximo la arquitectura de la máquina descrita, se puede utilizar una combinación de varios modelos
+de programación concurrente, como se describe a continuación:
+
+    1. Paralelismo a nivel de tareas: El paralelismo a nivel de tareas es útil para dividir una tarea grande en
+    sub-tareas más pequeñas, que pueden ejecutarse simultáneamente. Para explotar al máximo los 16 nodos de la máquina,
+    se pueden dividir las tareas en pequeñas unidades de trabajo que se asignan a diferentes nodos. Cada tarea se puede
+    ejecutar en paralelo en varios núcleos de CPU y en la GPU para aprovechar al máximo los recursos disponibles.
+
+    2. Paralelismo de datos: El paralelismo de datos es útil cuando se procesa grandes cantidades de datos de manera
+    simultánea. Para aprovechar al máximo los recursos de GPU, se puede utilizar el paralelismo de datos para procesar
+    grandes matrices de datos en paralelo utilizando múltiples núcleos de la GPU.
+
+    3. Modelo de actores: Se basa en la idea de que los componentes del software son actores que se comunican entre sí
+    a través de mensajes. Este modelo es útil para sistemas distribuidos y para aprovechar al máximo los recursos de la
+    máquina descrita, se puede utilizar el modelo de actores para dividir una tarea grande en pequeños actores que se
+    ejecutan en diferentes nodos. Cada actor puede ejecutarse en paralelo en varios núcleos de CPU y en la GPU para
+    aprovechar al máximo los recursos disponibles.
+
+    4. Modelo de memoria compartida: El modelo de memoria compartida es útil para compartir datos entre diferentes
+    procesos o hilos de ejecución. Para aprovechar al máximo los recursos de CPU, se puede utilizar el modelo de
+    memoria compartida para dividir una tarea grande en sub-tareas más pequeñas que se ejecutan en diferentes hilos de
+    ejecución, cada uno de los cuales tiene acceso a la misma memoria compartida.
+
+En conclusión, para aprovechar al máximo la arquitectura descrita, se puede utilizar una combinación de los modelos de
+programación concurrente mencionados anteriormente. La combinación de estos modelos permitirá dividir las tareas en
+pequeñas unidades de trabajo, procesar grandes cantidades de datos en paralelo, comunicarse eficazmente entre
+diferentes componentes del software y compartir datos entre diferentes hilos de ejecución.
+
+
+
+-- Que complejidades introduce DMA.
+
+* El uso del controlador introduce algunas complejidades en el diseño y la programación del sistema:
+    1. Coordinación de memoria: Cuando se utiliza DMA, varios dispositivos pueden intentar acceder a la memoria
+    simultáneamente. Por lo tanto, se deben establecer mecanismos de coordinación para garantizar que los dispositivos
+    no colisionen entre sí y que la memoria no sea sobrescrita de forma incorrecta.
+
+    2. Asignación de recursos: La asignación de recursos puede ser un desafío cuando se utiliza DMA, ya que los
+    dispositivos pueden requerir acceso a ciertos rangos de memoria. El sistema debe asegurarse de que se asignen los
+    recursos necesarios de manera adecuada para evitar conflictos.
+
+    3. Seguridad: El uso de DMA también puede plantear problemas de seguridad. Si un dispositivo periférico se
+    compromete o se ve comprometido, puede utilizar el acceso directo a la memoria para leer o escribir datos sin
+    autorización. Es necesario implementar medidas de seguridad adecuadas para evitar que esto suceda.
+
+    4. Depuración y diagnóstico: La depuración y el diagnóstico pueden ser más complicados cuando se utiliza DMA, ya
+    que la transferencia de datos se produce sin la intervención del procesador. Esto puede dificultar la
+    identificación de problemas o errores en el sistema. Se deben implementar herramientas y técnicas de depuración
+    adecuadas para resolver estos problemas.
+
+En resumen, aunque el uso de DMA puede mejorar el rendimiento del sistema, también introduce algunas complejidades en
+el diseño y la programación. Se deben abordar estas complejidades de manera adecuada para garantizar que el sistema
+funcione de manera segura y eficiente.
+
+
+
+-- Explique los pasos que se ejecutan para realizar una escritura en un disposivo de E/S desde que el programa de
+usuario los solicita.
+
+* Cuando un programa de usuario solicita una escritura en un dispositivo E/S se ejecutan los siguientes pasos:
+
+    1- El programa de usuario emite una llamada al SO para solcitar la escritura en el dispositivo E/S. En esta
+    llamada, se especifica el dispositivo de E/S al que se desea escribir, la cantidad de datos a escribir y la
+    direccion de la memoria en la que se encuentran los datos que se desean escribir.
+    2- El SO verifica que el dispositivo de E/S especificado esta disponible y que el proceso que realiza la llamada
+    tiene los permisos necesarios para acceder al dispositivo. Si todo esta en orden, el SO acepta la solicitud y la
+    agrega a una cola de solicidades de escritura pendientes.
+    3- Cuando el dispositivo de E/S esta listo para recibir datos, el controlador del dispositivo de E/S emite una
+    interrupcion para notificar al SO de que puede comenzar la escritura. El SO recupera la solicitud de escritura de
+    la cola de solicitudes pendientes y la envia al controlador de E/S correspondiente.
+    4- El controlador de E/S obtiene los datos a escribir de la memoria del proceso y los almacena temporalmente en un
+    bufer interno del dispositivo.
+    5- El controlador de E/S transfiere los datos desde su bufer interno al dispositivo de E/S real.
+Dependiendo del tipo de dispositivo, esto puede implicar el envio de señales electricar, la emision de pulsos de luz,
+el cambio de la polaridad magnetica en un disco duro, entre otros.
+    6- Cuando la transferencia de datos ha terminado, el controlador de E/S emite otra interrupcion para notificar al
+    SO de que la escritura ha finalizado.
+    7- El SO devuelve el control al programa de usuario que solicito la escritura.
+Si el programa espera una respuesta del SO, puede recuperar el estado de la solicitud de escritura para verificar si se
+completo correctamente o no.
+
+En resumen, los pasos que se ejecutan para realizar una escritura en un dispositivo de E/S son la emision de una
+solicitud por parte del programa de usuario, la aceptacion, y encolamiento de la solicitud por parte del SO, la
+transferencia de datos desde el bufer interno del controlador de E/S al dispositivo de E/S real, y la notificacion al
+sistema operativo y al programa de usuario de que la escritura ha finalizado.
+
+
+
+-- De un ejemplo de código assembly de MIPS R2000 donde se produce un riesgo RAW soluble por forward.
+
+* addi $t0, $zero, 10     # carga el valor 10 en $t0
+addi $t1, $zero, 5      # carga el valor 5 en $t1
+add $t2, $t0, $t1       # suma $t0 y $t1, y almacena el resultado en $t2
+sub $t0, $t2, $t1       # resta $t1 de $t2, y almacena el resultado en $t0
+
+En este código, hay un riesgo RAW soluble por forward entre las instrucciones add y sub. La instrucción add escribe en
+el registro $t2, y la instrucción sub lee de $t2. Sin embargo, como la instrucción add se ejecuta antes de la
+instrucción sub, el resultado de add aún no se ha almacenado en $t2 cuando se ejecuta sub. Para resolver este problema,
+se utiliza el forwarding para adelantar el valor de $t2 desde la etapa de ejecución de la instrucción add hasta la
+etapa de ejecución de la instrucción sub. Esto permite que la instrucción sub lea el valor correcto de $t2 y evita el
+riesgo RAW.
+
+
+
+
+-- Explique los pasos que se ejecutan para realizar una escritura en un disposivo de E/S desde que el programa de
+usuario los solicita
+
+* 1) El progr de usuario emite una llamada al so para solicitar la escritura en un
+dispositivo de e/s
+2) El SO verifica que el dispositivo de E/S este disponible y que el proceso cumpla
+con los permisos necesarios
+3) Cuando el dispositivo de e/S esta listo para recibir datos. El so envia la solicitud
+de escritura al controlador de E/S correspondiente
+4) El controlador de e/s obtiene los datos del proceso y los almacena
+temporalmente en su bufer interno
+5) El controlador de e/s transfiere los datos desde su bufer interno aldispositivo de
+E/S real
+6) Cuando se ha finalizadola transferencia de datos el controlador emite una
+interrupcion para notificar al so que la escritura ha finalizado
+7) El so devuelve el control al programa de usuario que solicitolaescritura
+
+
+-- Que complejidades introduce DMA
+
+* Coordinacionde memoria: multiples dispositivos pueden intentar acceder a
+memoria simultaneamente por lo que es necesario un mecanismo de coordinacion
+para evitar colisiones y errores
+Asignacion de recursos: el sistema debe asignar los recursos adecuadamente para
+evitar problemas de aaceso a la memoria
+Seguridad: El DMA puede plantear problemas de seguridad cuando un dispositivo
+periferico se ve comprometido ya que puede acceder a la memoria sin autorizacion
+Depuracion y diagnostico: el uso de dma puede complicar en la identificacion de
+losproblemas y erroresdel sistemaporlo que es necesario herramientas y tecnicas de
+depuracion adecuadas
+
+
+-- De un ejemplo de código assembly de MIPS R2000 donde se produce un riesgo
+RAW soluble por forward
+
+* add $t0, $s0, $s1
+add $t1, $t0, $s2
+La segunda instruccion intenta acceder alcontenido de t0 que todavia no fue escrito
+por laprimera instruccion entonces se produce un riesgo raw
+para resolverlo se puede aplicar tecnicas de forwarding para enviar el resultado de
+la primera instruccion tantoa la etapa de ejecucion como a la etapa de regristro
+Esto permite que la seg instrucc pueda acceder al resultado antes de que se escriba
+en el registro
+
+
+-- En que categoría de Flynn ubicaría a CUDA. Justifique
+
+* modelo simd(una instruccion, multiples datos) todas las unidades ejecutan la
+misma instruccion sincronizadamente pero condistintos datos. Es un computador
+que explotavarios flujos de datos dentro de un unico flujo de intrucciones para
+realizar operaciones que pueden ser paralelizadas de manera natural.
+Cuda pertenece almodelo SIMD por lo tanto esta diseñado paraexplotar el
+paralelismo a nivel de datos, esto quiere decir que un conj de operaciones
+aritmeticas pueden ser ejecutadas sobre un conj de datos de manera simultanea
+Cuda ademas consiste en 1 o mas faces que se pueden ejecutar o bien en el
+procesador principal o en la GPU
+Las fases enlas que hay poco paralelismo se implementan en el codigo que se
+ejecuta en CPU y las fases donde hay un nivel elevado de paralelismo se
+implementan enel codigo que se ejecuta en la GPU
+
+
+-- Enumere y explique la necesidad de los metadatos en la memoria cache
+
+* Es la informacion adicional que se guarda juntos conlos datos enla cache. Esta info
+adicionar incluye informacion como la ubicacion del dato enmemoria, el tam del
+bloque, la ultima vez que se accedio al bloque.
+Son utiles para que la cache funcione de manera eficienteporejemplo cuando se
+busca un dato enla cache los metadatos se utilizar para saber si el dato se
+encuentra en la cache y si es asi donde se encuentra, en caso de que noseencuentre
+los metadatos se utilizan para saber cual de los bloques de MP tiene que ser traido
+a la cache
+Los metadatos tambien se utilizan para llevar un registro de la cant de espacio que
+esta siendo utilizado en memoria y para determinar que bloque reemplazar en caso
+de necesitar espacio para uno nuevo.

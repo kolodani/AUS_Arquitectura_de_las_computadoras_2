@@ -36,7 +36,7 @@
 * Desafios para programar GPU
 * la programacion CPU y GPU no son compatibles
 * todo dato a procesar debe convertirse en texturas para aprovechar el procesamiento por shaders
-* se usa la teecnica render to texture para escribir ya que no se puede acceder trivialmente a la memoria
+* se usa la tecnica render to texture para escribir ya que no se puede acceder trivialmente a la memoria
 * el calculo se realiza mediante flujo de procesador de fragmentos
 * Se hacen necesarios estandares como OpenCL y CUDA
 
