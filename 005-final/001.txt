@@ -1,22 +1,22 @@
--- objetivos de la memoria virtual:
+-- objetivos de la memoria virtual: (3)
 * aumentar el tamaño de memoria aparente (si)
 * mejorar la forma de compartir memoria (si)
 * mejorar el esquema de segurirad (si)
 * aumentar el rendimiento del sistema (no)
 
--- comparando discos rigidos y memorias flash
+-- comparando discos rigidos y memorias flash (2)
 * los discos rigidos son mas robustos (no)
 * los discos rigidos son mas economicos (si)
 * los discos rigidos tienen menor tiempo de acceso (no)
 * los discos rigidos son de mayor consumo de energia (si)
 
--- para evitar los problemas de memoria virtual con DMA
+-- para evitar los problemas de memoria virtual con DMA (2)
 * realizar transferencias de DMA limitadas dentro de paginas (si)
 * utilizar TLB (no)
 * configurar DMA con interrupciones (no)
 * solicitar memoria contigua para operaciones con DMA (si)
 
--- En que fase de la ejecucion de una instruccion en un procesador multiciclo se calcula la direccion efectiva?
+-- En que fase de la ejecucion de una instruccion en un procesador multiciclo se calcula la direccion efectiva? (1)
 * En la tercera fase solo si se trara de una instruccion de acceso a la memoria (si)
 * en la tercera fase para cualquier instruccion (no)
 * siempre en la primera fase (no)
@@ -25,7 +25,7 @@
 -- ¿Cual es el numero de registros de intersegmentos necesarios para implementar las etapas estudiadas de segmentacion del MIPS R2000?
 * 4
 
--- ¿Que elementos debe modificar para agregar la instruccion nop al procesador MIPS implementando en forma uniciclo? (puede haber mas de una correcta)
+-- ¿Que elementos debe modificar para agregar la instruccion nop al procesador MIPS implementando en forma uniciclo? (puede haber mas de una correcta) (3)
 * se debe realizar una modificacion a la ALU (no)
 * se debe agregar una columna en la tabla verdad de la unidad de control (no)
 * se debe alterar el datapath mediante un nuevo multiplexor que complete solo la suma de PC+4 (no)
@@ -34,64 +34,64 @@
 * se debe agregar una fila en la tabla verdad de la unidad de control (si)
 * se debe agregar un nuevo estado en la maquina de estado de la unidad de control (si)
 
--- en la implementacion multiciclo
+-- en la implementacion multiciclo (1)
 * no se utiliza ciclo de captacion (no)
 * todas las instrucciones duran el mismo tiempo (no)
 * se utilizan multiples sumadores (no)
 * es necesario un registro de instrucciones adicional (si)
 
--- señale las opciones correctas para la fase de decodificacion de un procesador multiciclo
+-- señale las opciones correctas para la fase de decodificacion de un procesador multiciclo (3)
 * en ALUout queda la direccion de salto calculada en caso de ser una instruccion de salto condicional (si)
 * la ALU realiza una suma (si)
 * una de las fuentes de la ALU es el registro B (no)
 * una de las fuentes de la ALU es el PC (si)
 * una de las fuentes de la ALU es el registro A (no)
 
--- la unidad de control en un procesador multiciclo:
+-- la unidad de control en un procesador multiciclo: (2)
 * depende del control de la ALU (no)
 * se implementa mediante un automata (si)
 * controla el registro ALUout (no)
 * depende del registro de intrucciones (si)
 
--- la maquina de estado finito
+-- la maquina de estado finito (1)
 * a lo sumo puede tener 7 estados (no)
 * siempre es microprogramada (no)
 * tiene siempre al menos 2 estados (si)
 * es asincronica (no)
 
--- las instruccions lw en un procesador uniciclo:
+-- las instruccions lw en un procesador uniciclo: (1)
 * son de tipo R (no)
 * nunca utilizan el PC (no)
 * son de tipo I (si)
 * sirven para cargar datos en la memoria (no)
 
--- ¿identifique las etapas de segmentacion estudiadas en el MIPS R2000?
+-- ¿identifique las etapas de segmentacion estudiadas en el MIPS R2000? (2)
 * execute (si)
 * instruction fetch (si)
 * forward (no)
 * white through (no)
 * instruction match (no)
 
--- en un pipeline la productividad esta limitadda por:
+-- en un pipeline la productividad esta limitadda por: (1)
 * la cantidad de memoria direccionable (no)
 * la cantidad de instrucciones del programa (no)
 * la velocidad de la etapa mas lenta (si)
 
--- las instrucciones que operan entre registros en un procesador segmentado de 5 etapas ya pueden resolverse durante el 4to ciclo ¿solucion implementa MIPS R2000?
+-- las instrucciones que operan entre registros en un procesador segmentado de 5 etapas ya pueden resolverse durante el 4to ciclo ¿solucion implementa MIPS R2000? (1)
 * hace forwarding (no)
 * para el cause (no)
 * retrasa la escritura en registros (si)
 * ninguna de las anteriores (no)
 * introduce una burbuja (no)
 
--- ¿cuales de las siguientes NO SON restricciones para la segmentacion de un procesador?
+-- ¿cuales de las siguientes NO SON restricciones para la segmentacion de un procesador? (2)
 * etapas desequilibradas (no)
 * el numero de etapas (no)
 * tamaño de la palabra (si)
 * la etapa mas rapida (si)
 * la etapa mas lenta (no)
 
--- ¿que aplicaciones se adaptan mejor a la arquitectura de una GPU?
+-- ¿que aplicaciones se adaptan mejor a la arquitectura de una GPU? (4)
 * inteligencia artificial (si)
 * base de datos (no)
 * compliladores (no)
@@ -100,7 +100,7 @@
 * algebra lineal (si)
 * mecanica computacional (si)
 
--- ¿cuales de las siguientes son catacteristicas de la arquitectura de la GPU NVidia?
+-- ¿cuales de las siguientes son catacteristicas de la arquitectura de la GPU NVidia? (4)
 * comparte memoria con la CPU (no)
 * reconoce el standar IEEE 754 (si)
 * carga y control de flujo en dos etapas (si)
@@ -110,25 +110,25 @@
 * ninguna de las otras opciones (no)
 * es orientada a flujos (si)
 
--- cuales son los desafios de la programacion GPU?
+-- cuales son los desafios de la programacion GPU? (2)
 * es necesario comprender sobre shaders (si)
 * es necesario un conocimiento profundo del harware grafico (no)
 * se necesitan de estandards especiales como CUDA (si)
 * es igual a la programacion de CPU (no)
 
--- cuales de las siguientes no es una limitacion de la GPU? (equicale a preguntar cual afirmacion es falsa)
+-- cuales de las siguientes no es una limitacion de la GPU? (equicale a preguntar cual afirmacion es falsa) (1)
 * no se puede hacer una depuracion sencilla (no)
 * no puede acceder directamente a la memoria del procesador (no)
 * no se puede hacer uso en el codigo de la salida estandar (no)
 * no se puede hacer calculo flotante (si)
 
--- ¿a que llamamos dependencia de verdad en un procesador superescalar?
+-- ¿a que llamamos dependencia de verdad en un procesador superescalar? (1)
 * cuando se produce una bifurcacion en una de las vias (no)
 * ninguna de las anteriores (no)
 * cuando las unidades funcionales ya estan todas ocupadas (no)
 * cuando se necesita un operando previamente que esta siendo calculado en otra via en ese momento (si)
 
--- ¿que tipos de paralemismo existen en bajo nivel (low level)?
+-- ¿que tipos de paralemismo existen en bajo nivel (low level)? (2)
 * a nivel de codigo (no)
 * no hay low level paralelsimo (no)
 * a nivel de instruccion (si)
@@ -139,61 +139,61 @@
 * SIMD (si)
 significa single instruction multiple data
 
--- el diagrama de jerarquia de memoria sirve para
+-- el diagrama de jerarquia de memoria sirve para (1)
 * mostrar la relacion entre memoria y E/S programada, instrucciones y DMA (no)
 * mostrar la relaccion eentre procesador, memoria y entrada-salida (no)
 * mostra la relacion entre memoria de datos y programada (no)
 * mostrar la relacion de compromiso entre velocidad, capacidad y coste (si)
 
--- el reemplazo de un bloque en la cache
+-- el reemplazo de un bloque en la cache (1)
 * se da en mapeo directo cuando la posicion a usar esta usada (si)
 * se da en mapeo directo cuando el bit dirty asi lo indica (no)
 * se da en cache asociativas cuando la posicion a usar esta usada (no)
 * se da en cache asociativas cuando el tamaño de bloque es mayor que una palabra (no)
 
--- el tiempo de penalizacion depende de
+-- el tiempo de penalizacion depende de (1)
 * el tamaño de la memoria principal (no)
 * el tamaño de bloque (si)
 * el tamaño de la cache (no)
 * el programa en ejecucion (no)
 
--- en la memoria virtual paginada
+-- en la memoria virtual paginada (1)
 * las paginas deben estar siempre en la memoria principal (no)
 * las paginas son de tamaño fijo (si)
 * los marcos de pagina deben poseer tamaño mayor al de la pagina (no)
 * las paginas pueden aumentar de tamaño (no)
 
--- la memoria cache permite
+-- la memoria cache permite (1)
 * aumentar la eficiencia a la hora de acceder a entrada-salida (no)
 * aprovechar la localidad espacial y temporal (si)
 * aumentar la capacidad de la memoria principal (no)
 * aumentra la efectividad de accesos a datos de la memoria principal (no)
 
--- la TLB
+-- la TLB (1)
 * permitir optimizar la traduccion de una direccion (si)
 * premite aumentar la seguridad del sistema (no)
 * permite aumentar el rendimiento de la memoria cache (no)
 * permite evitar que la tabla de paginas aumente de tamaño (no)
 
--- E/S programada en relacion a interrupciones y DMA
+-- E/S programada en relacion a interrupciones y DMA (1)
 * es compleja de implementar (no)
 * es conveniente cuando el procesador no tiene otra tarea (si)
 * requiere que el controlador de E/S lo soporte (no)
 * e mas conveniente desde el punto de vista de un programa de usuario (no)
 
--- la direccion de retorno luego de una interrupcion en MIPS se almacena
+-- la direccion de retorno luego de una interrupcion en MIPS se almacena (1)
 * en RA y luego ouede ser salvada en la pila (no)
 * en un registro especial y luego puede ser salvada en la pila (si)
 * en la pila (no)
 * es configurable por el SO (no)
 
--- el concepto de RAID permite
+-- el concepto de RAID permite (2)
 * incrementra la confidencialidad de los datos (no)
 * restaurar una version anterior de los datos (no)
-* mejorar la confiabilidad del sisetema de almacenamiento (si)
+* mejorar la confiabilidad del sistema de almacenamiento (si)
 * mejorar los tiempos de acceso al sistema de almacenaiento (si)
 
--- identifique posibles soluciones a los riesgos por dependencia de datos:
+-- identifique posibles soluciones a los riesgos por dependencia de datos: (5)
 * reestructurar la secuencia lecto/escritura de WB (si)
 * reordenamiento del cogigo (si)
 * detencion del reloj (no)
@@ -202,114 +202,114 @@ significa single instruction multiple data
 * stall (si)
 * modificacion del ciclo de reloj (no)
 
--- la unidad de control en un procesador uniciclo:
+-- la unidad de control en un procesador uniciclo: (1)
 * es una tabla verdad (si)
 * esta microprogramada (no)
 * no es ninguna de las anteriores (no)
 * es una automata cableado (no)
 
--- en la implementacion MIPS de 5 etapas estudiada que tipo de riesgos de datos se presenta?
+-- en la implementacion MIPS de 5 etapas estudiada que tipo de riesgos de datos se presenta? (1)
 * WAW (no)
 * RAW (si)
 * WAR (no)
 
--- la tabla de paginas
+-- la tabla de paginas (1)
 * permite saber si la pagina ha sido actualizada en memoria principal (si)
 * permite saber si la pagina es de tamaño fijo o variable (no)
 * permite optimizar el uso de la cache (no)
 * permite ubicar la pagina en la memoria secundaria (no)
 
--- ¿cual de los siguientes registros no esta en el banco de registros?
+-- ¿cual de los siguientes registros no esta en el banco de registros? (1)
 * zero (no)
 * frame pointer (no)
 * program counter (si)
 * stack pointer (no)
 
--- al realizar una operacion de E/S con interrupciones
+-- al realizar una operacion de E/S con interrupciones (2)
 * debo tener presente que el rendimiento de la cache es menor (no)
 * debo considerar que otro proceso puede pasar a ser ejecutado (si)
 * debo teenr presente que es conveniente para operaciones de gran ancho de banda (no)
 * debo considerar que el SO es el encargado de aldministrar la misma (si)
 
--- el registro ALUout sirve para guardar:
+-- el registro ALUout sirve para guardar: (1)
 * el signo de la operaciones de comparacion (no)
 * el valor del proximo PC (no)
 * el resultado de las operaciones aritmeticas (si)
 * la direccion efectiva de acceso para las instrucciones sw/lw (no)
 * la direccion de salto condicional (no)
 
--- los controladores de E/S
-* reducen la latenci de acceso al dispositivo de E/S (no)
+-- los controladores de E/S (1)
+* reducen la latenciA de acceso al dispositivo de E/S (no)
 * sircen de interfaz con el mundo exterior (no)
 * permiten un acceso simple desde la perspectiva del procesador (si)
 * presentan una serie de registros accesibles al procesador (si)
 
--- el acceso al controlador de E/S en MIPS
+-- el acceso al controlador de E/S en MIPS (1)
 * se realiza siempre a traves de DMA (no)
 * se realiza mediante un juego nuevo de instrucciones (no)
 * se realiza mediante las mismas instrucciones que para acceder a memoria (si)
 * se realiza desde espacio de usuario (no)
 
--- la asociatividad por conjunto
+-- la asociatividad por conjunto (1)
 * a moyor cantidad de vias, el comportamiento es mas similar a la directa (no)
 * permite tener una memoria cache mas rapida (no)
 * es una solucion de compromiso entre mapeo directo y asociativo (si)
 * el numero de vias debe ser menor que 4 (no)
 
--- que mejora tiene RAID 6 sobre RAID 5
+-- que mejora tiene RAID 6 sobre RAID 5 (1)
 * soporta la falla de dos discos (si)
 * permite recuperarse de errores logicos (no)
 * posee un disco para hot swap (no)
 * permite reducir el tiempo de escritura (no)
 
--- el procesador uniciclo se distingue por:
+-- el procesador uniciclo se distingue por: (1)
 * realizar la ejecucion de cada instruccion en un ciclo largo (si)
 * tener instrucciones con diferentes ciclos de reloj (no)
 * tener un registro especial MDR (no)
 * tener un solo sumador para todas las operaciones (no)
 
--- Comparando buses E/S con los procesador memoria
+-- Comparando buses E/S con los procesador memoria (2)
 * los buses E/S poseen mayor ancho de banda (no)
 * los E/S soportan distancias mas largas (si)
 * los buses E/S estan estandarisados (si)
 * los buses E/S poseen mayor numero de lineas (no)
 
--- los bloques de la cache poseen
+-- los bloques de la cache poseen (3)
 * direcciones en RAM (no)
 * bit de validez (si)
 * etiqueta (si)
 * datos (si)
 
--- para permitir interrupciones anidadas
+-- para permitir interrupciones anidadas (3)
 * se debe salvar el contenido de todos los registros en la pila (no)
 * se debe salvar el contenido de los registros a usar en la pila (si)
 * se debe salvar el EPC en la pila (si)
 * se debe habilitar el manejo de interrupciones (si)
 
--- al realizar un operacion de E/S con DMA
+-- al realizar un operacion de E/S con DMA (2)
 * debo considerar que la memoria cache mejora el rendimiento de las operacion de E/S (no)
 * debo considerar que las interrupciones no son necesarias (no)
 * debo considerar que puedo tener inconvenientes con la memoria virtual (si)
 * debo considerar qeu el bus y la memoria van a ser utilizados por el procesador (si)
 
--- la localizacion del bloque en una cache asociativa
+-- la localizacion del bloque en una cache asociativa (1)
 * implica que cada bloque puede ser ubicado gracias a la etiqueta (si)
 * implica que cada bloque puede ser ubicado en forma mas eficiente (no)
 * implica que la cache posee bits de control (no)
 * implica que cada bloque tiene tamaño fijo (no)
 
--- las instrucciones tipo R en un procesador uniciclo:
+-- las instrucciones tipo R en un procesador uniciclo: (1)
 * utilizan todas las unidades funcinales (no)
 * necesitan siempre de la ALU (si)
 * acceden a la memoria de datos (no)
 
--- las instrucciones lw en un proocesador multiciclo:
+-- las instrucciones lw en un procesador multiciclo: (1)
 * utilizan la unidad de extension de signo (no)
 * son las que necesitan mayor cantidad de unidades funcionales (si)
 * son las que menos tiempo ocupan (no)
 * sirven para cargar la direccion de salto incondicional (no)
 
--- la tasa de fallo depende de
+-- la tasa de fallo depende de (3)
 * el programa en ejecucion (si)
 * el tamaño de bloque (si)
 * el tamaño de la cache (si)
