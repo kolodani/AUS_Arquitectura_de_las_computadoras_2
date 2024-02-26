@@ -357,7 +357,7 @@ de los límites de la matriz (menores que "N"). Esto evita que los hilos intente
 de los limites de las matrices.
 4. Operacion de Suma de Matrices: Si los indices estan dentro de los limites, se realiza la operación de suma de
 matrices. La posición
-"C[index[" en la matriz resultante se actualiza sumando los elementos correspondientes de las matrices de entrada
+"C[index]" en la matriz resultante se actualiza sumando los elementos correspondientes de las matrices de entrada
 "A" y "B".
 En terminos de paralelismo, cada hilo de ejecucion en el bloque CUDA realiza una operacion de suma de matrices
 independiente en paralelo.
@@ -420,13 +420,13 @@ de envio
 
 -- Enumere y explique la necesidad de los metadatos que se encuentran en la tabla de paginas.
 * La tabla de paginas en un sistema de gestion de memoria virtual juega un papel crucial al mapear las direcciones
-virtuales a direcciones iísicas.
+virtuales a direcciones fisicas.
 los metadatos asociados a la tabla de paginas son necesarios para gestionar eficientemente la memoria virtual.
 1.Marco de Página Asociado: asocia cada entrada en la tabla de paginas con un marco de pagina especifico en la memoria
 fisica, permite la traduccion de direcciones virtuales a direcciones fisicas al indicar donde reside cada pagina en la
 memoria fisica.
 2. Bit de Presente/Ausente: indica si una pagina esta presente en la memoria fisica o si ha sido movida a la memoria
-secundariay ayuda a gestionar eficientemente la paginacion y determina si se necesita realizar una operacion de
+secundaria y ayuda a gestionar eficientemente la paginacion y determina si se necesita realizar una operacion de
 intercambio desde el almacenamiento secundario.
 3.Bits de Protección (read/write/execute): define los permisos de acceso a una pagina, como lectura, escritura o
 ejecucion. controla y protege el acceso a las paginas, asegurando que las operaciones se realicen segun las politicas
@@ -437,9 +437,8 @@ o la escritura diferida.
 5.Bits de Compartido o Privado: indica si una pagina es compartida entre procesos o es exclusiva de un proceso. permite
 la implementacion de la memoria compartida, donde varias instancias de un proceso pueden acceder a la misma pagina
 fisica.
-6. Bits de Cache Disable/Enable: controla si una pagina debe almacenarse o no en la memoria cacha .permite optimizar el
+6. Bits de Cache Disable/Enable: controla si una pagina debe almacenarse o no en la memoria cache .permite optimizar el
 rendimiento al determinar que paginas deben almacenarse directamente en la memoria cache o cuales pueden mantenerse en
 la memoria principal.
 7.Bits de Tamaño de pagina: define el tamaño de cada pagina en la memoria virtual. facilita la gestion eficiente de la
 memoria al ajustar el tamaño de las paginas segun los requisitos del sistema y las caracteristicas de las aplicaciones.
-
